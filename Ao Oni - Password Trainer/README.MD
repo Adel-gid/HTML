@@ -42,8 +42,8 @@ To enable the authentic sound effects, you must manually place the following fil
 ## ⚖️ License
 
 ### Code
-The source code (`index.html`) is licensed under the **BSD 2-Clause "Simplified" License**. See the `LICENSE` file for details.
+The source code (`index.html`) is licensed under the **BSD 2-Clause "Simplified" License**. See the `LICENSE-BSD2.TXT` file for details.
 
 ### Assets & Trademarks
 * **Ao Oni** is a game developed by noprops. This tool is an unofficial fan project.
-* **RPG Maker VX Ace RTP** materials are the property of **KADOKAWA / ENTERBRAIN, INC.** Their use is governed by their own EULA (see `LICENSE_RTP.txt`). This project does not distribute these assets.
+* **RPG Maker VX Ace RTP** materials are the property of **KADOKAWA / ENTERBRAIN, INC.** Their use is governed by their own EULA (see `LICENSE_RTP.TXT`). This project does not distribute these assets.
