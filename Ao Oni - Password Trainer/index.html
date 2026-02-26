@@ -1,0 +1,763 @@
+<!-- Code is licensed under BSD 2.0. Audio assets (not included) are property of their respective owners. -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ao Oni Password Trainer</title>
+    <style>
+        @font-face {
+            font-family: 'Retro';
+            src: local('Courier New'), monospace;
+        }
+
+        body {
+            background-color: #fdf5e6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Retro', monospace;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .app-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+        }
+
+        .lock-container {
+            background-color: black;
+            border: 2px solid white;
+            border-radius: 3px;
+            padding: 25px 40px;
+            box-shadow: 0 0 0 4px black;
+            position: relative;
+        }
+
+        .game-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #lock-box {
+            width: 400px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            transition: width 0.3s ease;
+        }
+
+        .digits-display {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 10px;
+        }
+
+        .digit-block {
+            display: flex;
+            align-items: center;
+        }
+
+        .cursor {
+            color: white;
+            font-size: 20px;
+            width: 14px;
+            text-align: right;
+            margin-right: 2px;
+        }
+
+        .cursor.hidden-cursor { visibility: hidden; }
+
+        .digit {
+            color: white;
+            font-size: 28px;
+            width: 20px;
+            text-align: center;
+            font-family: 'Retro', monospace;
+        }
+
+        .z-prompt {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: black;
+            color: white;
+            font-size: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 3px;
+        }
+
+        #config-panel {
+            width: 450px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            font-size: 16px;
+        }
+
+        .config-header {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .config-sections-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+
+        .config-sections-container::-webkit-scrollbar { width: 8px; }
+        .config-sections-container::-webkit-scrollbar-track { background: #111; }
+        .config-sections-container::-webkit-scrollbar-thumb { background: #fff; border-radius: 4px; }
+
+        .config-section {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #444;
+            padding-bottom: 10px;
+        }
+
+        .sec-header {
+            display: flex;
+            justify-content: space-between;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .collapse-icon {
+            cursor: pointer;
+            color: white;
+            margin-right: 5px;
+        }
+        .collapse-icon:hover { color: #aaa; }
+
+        .code-row {
+            display: flex;
+            justify-content: space-between;
+            padding-left: 20px;
+            margin-bottom: 4px;
+        }
+
+        .icon-btn {
+            cursor: pointer;
+            margin-left: 8px;
+            user-select: none;
+            font-size: 18px;
+        }
+
+        .icon-btn:hover { opacity: 0.7; }
+        .icon-btn.blue { color: #4da6ff; }
+        .icon-btn.red { color: #ff4d4d; }
+        .icon-btn.yellow { color: #ffcc00; }
+        .icon-btn.gray { color: #555; filter: grayscale(100%); }
+
+        .config-footer {
+            text-align: center;
+            border-top: 2px solid white;
+            padding-top: 15px;
+        }
+
+        .btn-row { margin-bottom: 10px; display: flex; justify-content: center; gap: 15px; }
+
+        .retro-btn {
+            font-family: 'Retro', monospace;
+            padding: 8px 15px;
+            cursor: pointer;
+            border: 2px solid white;
+            background: black;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .retro-btn:hover { opacity: 0.8; }
+        .retro-btn:active { background: #333; }
+
+        .mode-all { color: #4CAF50; border-color: #4CAF50; }
+        .mode-all.selected { background: #4CAF50; color: black; }
+        .mode-random { color: #FF9800; border-color: #FF9800; }
+        .mode-random.selected { background: #FF9800; color: black; }
+
+        .btn-mute { color: #ccc; border-color: #ccc; }
+        .btn-mute.muted { background: #ccc; color: black; }
+
+        .start-btn { color: #fff; border-color: #fff; background: #222; }
+
+        .hidden { display: none !important; }
+
+        .ui-panel {
+            margin-bottom: 20px;
+            text-align: center;
+            height: 100px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            width: 400px;
+        }
+
+        .hint-text {
+            color: #d32f2f;
+            margin-top: 10px;
+            font-size: 22px;
+            min-height: 30px;
+        }
+
+        .restart-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: 2px solid #111;
+            cursor: pointer;
+            font-family: 'Retro', monospace;
+            font-size: 16px;
+        }
+        .restart-btn:hover { background-color: #555; }
+        .restart-btn:active { background-color: #000; }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="config-panel" class="lock-container hidden">
+            <div class="config-header">SYSTEM SETUP</div>
+            <div id="config-sections-container" class="config-sections-container"></div>
+
+            <div class="config-footer">
+                <div class="btn-row">
+                    <button id="btn-mode-all" class="retro-btn mode-all selected" onclick="setMode('ALL')">All</button>
+                    <button id="btn-mode-random" class="retro-btn mode-random" onclick="setMode('RANDOM')">Random</button>
+                    <button id="btn-mute" class="retro-btn btn-mute" onclick="toggleMute()">Mute</button>
+                </div>
+                <div class="btn-row">
+                    <button class="retro-btn" onclick="askCreateSection()">+ Section</button>
+                    <button class="retro-btn start-btn" onclick="startTraining()">START TRAINING</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-panel" class="game-panel hidden">
+            <div class="ui-panel">
+                <div id="category-name">Waiting...</div>
+                <div id="message-area"></div>
+                <div id="hint-area" class="hint-text hidden"></div>
+            </div>
+
+            <div class="lock-container" id="lock-box">
+                <div class="z-prompt" id="z-prompt">Z</div>
+                <div class="digits-display" id="digits-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="restart-btn" id="restart-btn">Full restart</button>
+
+    <script>
+        const sndMove = new Audio('Audio/001-System01.ogg');
+        const sndConfirm = new Audio('Audio/002-System02.ogg');
+        const sndRestart = new Audio('Audio/003-System03.ogg');
+        const sndUnavailable = new Audio('Audio/004-System04.ogg');
+
+        let isMuted = false;
+
+        function playSound(audioObj) {
+            if (isMuted || !audioObj) return;
+            audioObj.currentTime = 0;
+            audioObj.play().catch(() => {});
+        }
+
+        function showError(msg) {
+            playSound(sndUnavailable);
+            setTimeout(() => alert(msg), 15);
+        }
+
+        function findSolution(number, preferRight = true) {
+            if (!number) return "";
+            const arrowNotation = {
+                "0": "", "1": "↑", "2": "↑↑", "3": "↑↑↑", "4": "↑↑↑↑",
+                "5": "↑↑↑↑↑", "6": "↓↓↓↓", "7": "↓↓↓", "8": "↓↓", "9": "↓"
+            };
+
+            const l = number.split('').map(c => arrowNotation[c] || "");
+
+            // move_l
+            let move_l = l[0];
+            if (l.length > 1) {
+                let lRestReversed = l.slice(1).reverse();
+                move_l += "←" + lRestReversed.join("←");
+            }
+            move_l = move_l.replace(/[←→]+$/, '');
+
+            // move_r
+            let move_r = l.join("→").replace(/[←→]+$/, '');
+
+            let preferRightVal = preferRight ? 1 : 0;
+            let chosen = (move_r.length < move_l.length + preferRightVal) ? move_r : move_l;
+
+            return chosen + " Z";
+        }
+
+        let categories =[
+            {
+                name: "Piano",
+                isCollapsed: false,
+                codes:[
+                    { target: "6799", isActive: true },
+                    { target: "9761", isActive: true },
+                    { target: "6392", isActive: true },
+                    { target: "1416", isActive: true },
+                    { target: "5156", isActive: true }
+                ]
+            },
+            {
+                name: "Closet",
+                isCollapsed: false,
+                codes:[ { target: "5376", isActive: true } ]
+            },
+            {
+                name: "Safe",
+                isCollapsed: false,
+                codes:[
+                    { target: "290", isActive: true },
+                    { target: "361", isActive: true },
+                    { target: "528", isActive: true }
+                ]
+            },
+            {
+                name: "Iron door",
+                isCollapsed: false,
+                codes:[ { target: "1237", isActive: true } ]
+            },
+            {
+                name: "Another safe",
+                isCollapsed: false,
+                codes:[ { target: "3045", isActive: true } ]
+            }
+        ];
+
+        categories.forEach(cat => {
+            cat.codes.forEach(c => { c.hint = findSolution(c.target); });
+        });
+
+        let gameMode = 'ALL';
+
+        let currentCategoryIdx = 0;
+        let enteredCodes = [];
+        let digits =[];
+        let cursorPos = 0;
+
+        let state = 'CONFIG';
+        let blindMode = false;
+        let showHint = false;
+        let qHeld = false;
+
+        let startTime = 0;
+        let totalStartTime = 0;
+
+        const elConfigPanel = document.getElementById('config-panel');
+        const elGamePanel = document.getElementById('game-panel');
+        const elConfigContainer = document.getElementById('config-sections-container');
+
+        const elCategory = document.getElementById('category-name');
+        const elMessage = document.getElementById('message-area');
+        const elHint = document.getElementById('hint-area');
+        const elDigits = document.getElementById('digits-display');
+        const elZPrompt = document.getElementById('z-prompt');
+        const elLockBox = document.getElementById('lock-box');
+        const btnRestart = document.getElementById('restart-btn');
+
+        // ==========================================
+        //         CONFIGURATION LOGIC
+        // ==========================================
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('btn-mute');
+            btn.innerText = isMuted ? 'Unmute' : 'Mute';
+            btn.classList.toggle('muted', isMuted);
+
+            if (!isMuted) playSound(sndMove);
+        }
+
+        function setMode(mode) {
+            playSound(sndMove);
+            gameMode = mode;
+            document.getElementById('btn-mode-all').classList.toggle('selected', mode === 'ALL');
+            document.getElementById('btn-mode-random').classList.toggle('selected', mode === 'RANDOM');
+        }
+
+        window.toggleCollapse = function(cIdx) {
+            playSound(sndMove);
+            categories[cIdx].isCollapsed = !categories[cIdx].isCollapsed;
+            renderConfig();
+        };
+
+        function renderConfig() {
+            elConfigContainer.innerHTML = '';
+            categories.forEach((cat, cIdx) => {
+                let collapseIcon = cat.isCollapsed ? '[*]' : '[+]';
+                let secHtml = `
+                    <div class="config-section">
+                        <div class="sec-header">
+                            <div>
+                                <span class="collapse-icon" onclick="toggleCollapse(${cIdx})" title="Collapse/Expand">${collapseIcon}</span>
+                                <span>${cat.name}</span>
+                            </div>
+                            <div>
+                                <span class="icon-btn blue" onclick="askEditSection(${cIdx})" title="Rename section">✎</span>
+                                <span class="icon-btn blue" onclick="askAddCode(${cIdx})" title="Add code to section">➕</span>
+                                <span class="icon-btn red" onclick="askDeleteSection(${cIdx})" title="Delete section">✖</span>
+                            </div>
+                        </div>
+                `;
+
+                if (!cat.isCollapsed) {
+                    cat.codes.forEach((codeObj, codeIdx) => {
+                        let bulbClass = codeObj.isActive ? 'yellow' : 'gray';
+                        let hintStr = codeObj.hint ? ` <span style="color:#888;font-size:12px;">(${codeObj.hint})</span>` : '';
+                        secHtml += `
+                            <div class="code-row">
+                                <span>└─ ${codeObj.target}${hintStr}</span>
+                                <div>
+                                    <span class="icon-btn blue" onclick="askEditCode(${cIdx}, ${codeIdx})" title="Change code">✎</span>
+                                    <span class="icon-btn ${bulbClass}" onclick="toggleCodeActive(${cIdx}, ${codeIdx})" title="On/Off">💡</span>
+                                    <span class="icon-btn red" onclick="askDeleteCode(${cIdx}, ${codeIdx})" title="Remove code">✖</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                secHtml += `</div>`;
+                elConfigContainer.innerHTML += secHtml;
+            });
+        }
+
+        window.askEditSection = function(cIdx) {
+            playSound(sndMove);
+            let newVal = prompt("Enter a new section name :", categories[cIdx].name);
+            if(newVal !== null && newVal.trim() !== "") {
+                categories[cIdx].name = newVal.trim();
+                renderConfig();
+            }
+        };
+
+        window.askDeleteSection = function(cIdx) {
+            playSound(sndMove);
+            if(categories.length <= 1) return showError("Error! There must be at least one section.");
+            if(confirm(`Delete section '${categories[cIdx].name}'?`)) {
+                categories.splice(cIdx, 1);
+                renderConfig();
+            }
+        };
+
+        window.askEditCode = function(cIdx, codeIdx) {
+            playSound(sndMove);
+            let codeObj = categories[cIdx].codes[codeIdx];
+            let reqLen = categories[cIdx].codes[0].target.length;
+            let newCode = prompt(`Enter the code (strictly ${reqLen} digits) :`, codeObj.target);
+            if(newCode !== null) {
+                newCode = newCode.trim();
+                if(newCode.length !== reqLen) return showError(`Error! Code length must be ${reqLen}.`);
+                if(!/^\d+$/.test(newCode)) return showError("Error! Only numbers.");
+
+                codeObj.target = newCode;
+                codeObj.hint = findSolution(newCode);
+                renderConfig();
+            }
+        };
+
+        window.toggleCodeActive = function(cIdx, codeIdx) {
+            playSound(sndMove);
+            let codeObj = categories[cIdx].codes[codeIdx];
+            if(codeObj.isActive) {
+                let activeCount = categories[cIdx].codes.filter(c => c.isActive).length;
+                if(activeCount <= 1) return showError("Error! The section must contain at least one enabled code.");
+            }
+            codeObj.isActive = !codeObj.isActive;
+            renderConfig();
+        };
+
+        window.askDeleteCode = function(cIdx, codeIdx) {
+            playSound(sndMove);
+            if(categories[cIdx].codes.length <= 1) return showError("Error! You cannot delete the last code in a section.");
+            if(confirm("Remove this code?")) {
+                categories[cIdx].codes.splice(codeIdx, 1);
+                renderConfig();
+            }
+        };
+
+        window.askCreateSection = function() {
+            playSound(sndMove);
+            let name = prompt("Name of the new section :");
+            if(!name) return;
+            let lenStr = prompt("Code length (e.g. 4) :");
+            let len = parseInt(lenStr, 10);
+            if(isNaN(len) || len <= 0) return showError("Invalid length.");
+
+            let estimatedW = (len * 26) + 120;
+            if(estimatedW > window.innerWidth * 0.9) return showError("Error! The code is so long that it will extend beyond the screen.");
+
+            let code = prompt(`Enter the FIRST code (strictly ${len} digits) :`);
+            if(!code || code.length !== len || !/^\d+$/.test(code)) return showError(`Error! Need ${len} digits.`);
+
+            categories.push({
+                name: name.trim(),
+                isCollapsed: false,
+                randomTarget: null,
+                codes: [{ target: code.trim(), hint: findSolution(code.trim()), isActive: true }]
+            });
+            renderConfig();
+        };
+
+        window.askAddCode = function(cIdx) {
+            playSound(sndMove);
+            let reqLen = categories[cIdx].codes[0].target.length;
+            let newCode = prompt(`Enter the new code (strictly ${reqLen} digits) :`);
+            if(!newCode) return;
+            if(newCode.length !== reqLen || !/^\d+$/.test(newCode)) return showError(`Error! Need ${reqLen} digits.`);
+
+            categories[cIdx].codes.push({ target: newCode, hint: findSolution(newCode), isActive: true });
+            renderConfig();
+        };
+
+        // ==========================================
+        //         GAME LOGIC
+        // ==========================================
+
+        function initConfig() {
+            state = 'CONFIG';
+            elConfigPanel.classList.remove('hidden');
+            elGamePanel.classList.add('hidden');
+            renderConfig();
+        }
+
+        window.startTraining = function() {
+            playSound(sndConfirm); // Accept/Open menu sound
+            blindMode = qHeld;
+            state = 'WAITING_Z';
+            currentCategoryIdx = 0;
+            showHint = false;
+            totalStartTime = Date.now();
+
+            elConfigPanel.classList.add('hidden');
+            elGamePanel.classList.remove('hidden');
+            elMessage.innerText = "";
+            setupCategory();
+        };
+
+        function setupCategory() {
+            if (currentCategoryIdx >= categories.length) {
+                state = 'FINISHED';
+                elZPrompt.classList.add('hidden');
+                const totalTime = Date.now() - totalStartTime;
+                elCategory.innerText = "All Complete!";
+                elMessage.innerText = `Total time: ${totalTime} ms. Press Full Restart.`;
+                elDigits.innerHTML = "";
+                elHint.classList.add('hidden');
+                return;
+            }
+
+            state = 'WAITING_Z';
+            enteredCodes =[];
+            const category = categories[currentCategoryIdx];
+
+            const reqLen = category.codes[0].target.length;
+            const requiredWidth = Math.max(400, (reqLen * 26) + 120);
+            elLockBox.style.width = requiredWidth + 'px';
+
+            if (gameMode === 'RANDOM') {
+                const activeCodes = category.codes.filter(c => c.isActive);
+                const randIdx = Math.floor(Math.random() * activeCodes.length);
+                category.randomTarget = activeCodes[randIdx].target;
+            }
+
+            elZPrompt.classList.remove('hidden');
+            elCategory.innerText = `Category: ${category.name}`;
+            elHint.classList.add('hidden');
+            showHint = false;
+
+            resetDigits();
+        }
+
+        function resetDigits() {
+            const reqLen = categories[currentCategoryIdx].codes[0].target.length;
+            digits = Array(reqLen).fill(0);
+            cursorPos = 0;
+        }
+
+        function startInput() {
+            state = 'INPUTTING';
+            elZPrompt.classList.add('hidden');
+            startTime = Date.now();
+            render();
+        }
+
+        function render() {
+            if (state === 'FINISHED' || state === 'WAITING_Z' || state === 'CONFIG') return;
+
+            elDigits.innerHTML = "";
+            for (let i = 0; i < digits.length; i++) {
+                const block = document.createElement('div');
+                block.className = 'digit-block';
+
+                const cursor = document.createElement('div');
+                cursor.className = 'cursor';
+                if (i !== cursorPos) cursor.classList.add('hidden-cursor');
+                cursor.innerText = '▸';
+
+                const digit = document.createElement('div');
+                digit.className = 'digit';
+                digit.innerText = blindMode ? " " : digits[i];
+
+                block.appendChild(cursor);
+                block.appendChild(digit);
+                elDigits.appendChild(block);
+            }
+
+            if (showHint) {
+                const category = categories[currentCategoryIdx];
+                const activeCodes = category.codes.filter(c => c.isActive);
+                const unenteredCodes = activeCodes.filter(c => !enteredCodes.includes(c.target));
+
+                if (unenteredCodes.length > 0) {
+                    unenteredCodes.sort((a, b) => (a.hint || "").length - (b.hint || "").length);
+                    elHint.innerText = unenteredCodes[0].hint || "";
+                } else {
+                    elHint.innerText = "";
+                }
+                elHint.classList.remove('hidden');
+            } else {
+                elHint.classList.add('hidden');
+            }
+        }
+
+        function checkConfirm() {
+            const currentInput = digits.join('');
+            const category = categories[currentCategoryIdx];
+            const activeCodes = category.codes.filter(c => c.isActive);
+            const matchedCode = activeCodes.find(c => c.target === currentInput);
+
+            playSound(sndConfirm);
+
+            if (matchedCode && !enteredCodes.includes(currentInput)) {
+                enteredCodes.push(currentInput);
+                showHint = false;
+
+                if (gameMode === 'RANDOM') {
+                    if (currentInput === category.randomTarget) {
+                        const timeTaken = Date.now() - startTime;
+                        elMessage.innerText = `Good! ${timeTaken} ms`;
+                        currentCategoryIdx++;
+                        setupCategory();
+                    } else {
+                        elMessage.innerText = "Good, but not this one.";
+                        resetDigits();
+                        render();
+                    }
+                } else {
+                    if (enteredCodes.length < activeCodes.length) {
+                        elMessage.innerText = "Okay. Next.";
+                        resetDigits();
+                        render();
+                    } else {
+                        const timeTaken = Date.now() - startTime;
+                        elMessage.innerText = `Good! ${timeTaken} ms`;
+                        currentCategoryIdx++;
+                        setupCategory();
+                    }
+                }
+            } else {
+                elMessage.innerText = "Wrong!";
+                resetDigits();
+                render();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const isQ = e.code === 'KeyQ' || /^q|й$/i.test(e.key);
+            if (isQ) qHeld = true;
+
+            if (e.repeat) return;
+
+            const isConfirm = e.code === 'KeyZ' || e.code === 'KeyC' || e.code === 'Enter' || e.code === 'NumpadEnter' || /^z|c|я|с|enter$/i.test(e.key);
+            const isHint = e.code === 'KeyH' || /^h|р$/i.test(e.key);
+
+            if (state === 'WAITING_Z') {
+                if (isConfirm) {
+                    playSound(sndConfirm);
+                    startInput();
+                }
+                return;
+            }
+
+            if (state === 'INPUTTING') {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    cursorPos = (cursorPos - 1 + digits.length) % digits.length;
+                    playSound(sndMove);
+                    render();
+                }
+                else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    cursorPos = (cursorPos + 1) % digits.length;
+                    playSound(sndMove);
+                    render();
+                }
+                else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    digits[cursorPos] = (digits[cursorPos] + 1) % 10;
+                    playSound(sndMove);
+                    render();
+                }
+                else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    digits[cursorPos] = (digits[cursorPos] - 1 + 10) % 10;
+                    playSound(sndMove);
+                    render();
+                }
+                else if (isConfirm) {
+                    e.preventDefault();
+                    checkConfirm();
+                }
+                else if (isHint) {
+                    e.preventDefault();
+                    showHint = !showHint;
+                    render();
+                }
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const isQ = e.code === 'KeyQ' || /^q|й$/i.test(e.key);
+            if (isQ) qHeld = false;
+        });
+
+        btnRestart.addEventListener('click', () => {
+            playSound(sndRestart); // Cancel/Close menu
+            initConfig();
+        });
+
+        initConfig();
+
+    </script>
+</body>
+</html>
