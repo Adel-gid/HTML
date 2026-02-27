@@ -3,761 +3,1043 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Ao Oni Password Trainer</title>
-    <style>
-        @font-face {
-            font-family: 'Retro';
-            src: local('Courier New'), monospace;
-        }
+	<meta charset="UTF-8">
+	<title>Ao Oni Password Trainer</title>
+	<style>
+		@font-face {
+			font-family: 'Retro';
+			src: local('Courier New'), monospace;
+		}
 
-        body {
-            background-color: #fdf5e6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: 'Retro', monospace;
-            user-select: none;
-            overflow: hidden;
-        }
+		body {
+			background-color: #fdf5e6;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+			font-family: 'Retro', monospace;
+			user-select: none;
+			overflow: hidden;
+		}
 
-        .app-wrapper {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            width: 100%;
-        }
+		.top-left-controls {
+			position: absolute;
+			top: 20px;
+			left: 20px;
+			z-index: 50;
+		}
 
-        .lock-container {
-            background-color: black;
-            border: 2px solid white;
-            border-radius: 3px;
-            padding: 25px 40px;
-            box-shadow: 0 0 0 4px black;
-            position: relative;
-        }
+		.app-wrapper {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			gap: 40px;
+			width: 100%;
+		}
 
-        .game-panel {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+		.lock-container {
+			background-color: black;
+			border: 2px solid white;
+			border-radius: 3px;
+			padding: 25px 40px;
+			box-shadow: 0 0 0 4px black;
+			position: relative;
+		}
 
-        #lock-box {
-            width: 400px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            transition: width 0.3s ease;
-        }
+		.game-panel {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
 
-        .digits-display {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 10px;
-        }
+		#lock-box {
+			width: 400px;
+			height: 80px;
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			transition: width 0.3s ease;
+		}
 
-        .digit-block {
-            display: flex;
-            align-items: center;
-        }
+		.digits-display {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			margin-left: 10px;
+		}
 
-        .cursor {
-            color: white;
-            font-size: 20px;
-            width: 14px;
-            text-align: right;
-            margin-right: 2px;
-        }
+		.digit-block {
+			display: flex;
+			align-items: center;
+		}
 
-        .cursor.hidden-cursor { visibility: hidden; }
+		.cursor {
+			color: white;
+			font-size: 20px;
+			width: 14px;
+			text-align: right;
+			margin-right: 2px;
+		}
 
-        .digit {
-            color: white;
-            font-size: 28px;
-            width: 20px;
-            text-align: center;
-            font-family: 'Retro', monospace;
-        }
+		.cursor.hidden-cursor { visibility: hidden; }
 
-        .z-prompt {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: black;
-            color: white;
-            font-size: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            border-radius: 3px;
-        }
+		.digit {
+			color: white;
+			font-size: 28px;
+			width: 20px;
+			text-align: center;
+			font-family: 'Retro', monospace;
+		}
 
-        #config-panel {
-            width: 450px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            color: white;
-            font-size: 16px;
-        }
+		.z-prompt {
+			position: absolute;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background-color: black;
+			color: white;
+			font-size: 64px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 10;
+			border-radius: 3px;
+		}
 
-        .config-header {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
+		#config-panel {
+			width: 450px;
+			max-height: 80vh;
+			display: flex;
+			flex-direction: column;
+			color: white;
+			font-size: 16px;
+		}
 
-        .config-sections-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            padding-right: 10px;
-        }
+		.config-header {
+			text-align: center;
+			font-size: 24px;
+			margin-bottom: 15px;
+			letter-spacing: 2px;
+		}
 
-        .config-sections-container::-webkit-scrollbar { width: 8px; }
-        .config-sections-container::-webkit-scrollbar-track { background: #111; }
-        .config-sections-container::-webkit-scrollbar-thumb { background: #fff; border-radius: 4px; }
+		.config-sections-container {
+			flex-grow: 1;
+			overflow-y: auto;
+			margin-bottom: 20px;
+			padding-right: 10px;
+		}
 
-        .config-section {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #444;
-            padding-bottom: 10px;
-        }
+		.config-sections-container::-webkit-scrollbar { width: 8px; }
+		.config-sections-container::-webkit-scrollbar-track { background: #111; }
+		.config-sections-container::-webkit-scrollbar-thumb { background: #fff; border-radius: 4px; }
 
-        .sec-header {
-            display: flex;
-            justify-content: space-between;
-            color: #ccc;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
+		.config-section {
+			margin-bottom: 15px;
+			border-bottom: 1px dashed #444;
+			padding-bottom: 10px;
+		}
 
-        .collapse-icon {
-            cursor: pointer;
-            color: white;
-            margin-right: 5px;
-        }
-        .collapse-icon:hover { color: #aaa; }
+		.sec-header {
+			display: flex;
+			justify-content: space-between;
+			color: #ccc;
+			margin-bottom: 8px;
+			font-weight: bold;
+		}
 
-        .code-row {
-            display: flex;
-            justify-content: space-between;
-            padding-left: 20px;
-            margin-bottom: 4px;
-        }
+		.collapse-icon {
+			cursor: pointer;
+			color: white;
+			margin-right: 5px;
+		}
+		.collapse-icon:hover { color: #aaa; }
 
-        .icon-btn {
-            cursor: pointer;
-            margin-left: 8px;
-            user-select: none;
-            font-size: 18px;
-        }
+		.code-row {
+			display: flex;
+			justify-content: space-between;
+			padding-left: 20px;
+			margin-bottom: 4px;
+		}
 
-        .icon-btn:hover { opacity: 0.7; }
-        .icon-btn.blue { color: #4da6ff; }
-        .icon-btn.red { color: #ff4d4d; }
-        .icon-btn.yellow { color: #ffcc00; }
-        .icon-btn.gray { color: #555; filter: grayscale(100%); }
+		.icon-btn {
+			cursor: pointer;
+			margin-left: 8px;
+			user-select: none;
+			font-size: 18px;
+		}
 
-        .config-footer {
-            text-align: center;
-            border-top: 2px solid white;
-            padding-top: 15px;
-        }
+		.icon-btn:hover { opacity: 0.7; }
+		.icon-btn.blue { color: #4da6ff; }
+		.icon-btn.red { color: #ff4d4d; }
+		.icon-btn.yellow { color: #ffcc00; }
+		.icon-btn.gray { color: #555; filter: grayscale(100%); }
 
-        .btn-row { margin-bottom: 10px; display: flex; justify-content: center; gap: 15px; }
+		.config-footer {
+			text-align: center;
+			border-top: 2px solid white;
+			padding-top: 15px;
+		}
 
-        .retro-btn {
-            font-family: 'Retro', monospace;
-            padding: 8px 15px;
-            cursor: pointer;
-            border: 2px solid white;
-            background: black;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .retro-btn:hover { opacity: 0.8; }
-        .retro-btn:active { background: #333; }
+		.btn-row { margin-bottom: 10px; display: flex; justify-content: center; gap: 15px; }
 
-        .mode-all { color: #4CAF50; border-color: #4CAF50; }
-        .mode-all.selected { background: #4CAF50; color: black; }
-        .mode-random { color: #FF9800; border-color: #FF9800; }
-        .mode-random.selected { background: #FF9800; color: black; }
+		.retro-btn {
+			font-family: 'Retro', monospace;
+			padding: 8px 15px;
+			cursor: pointer;
+			border: 2px solid white;
+			background: black;
+			color: white;
+			font-size: 16px;
+			font-weight: bold;
+			transition: all 0.1s ease;
+		}
+		.retro-btn:hover { opacity: 0.8; }
+		.retro-btn:active { background: #333; }
 
-        .btn-mute { color: #ccc; border-color: #ccc; }
-        .btn-mute.muted { background: #ccc; color: black; }
+		.mode-all { color: #4CAF50; border-color: #4CAF50; }
+		.mode-all.selected { background: #4CAF50; color: black; }
+		.mode-random { color: #FF9800; border-color: #FF9800; }
+		.mode-random.selected { background: #FF9800; color: black; }
 
-        .start-btn { color: #fff; border-color: #fff; background: #222; }
+		.btn-mute { color: #ccc; border-color: #ccc; }
+		.btn-mute.muted { background: #ccc; color: black; }
 
-        .hidden { display: none !important; }
+		.start-btn { color: #fff; border-color: #fff; background: #222; }
+		
+		.red-btn { color: #ff4d4d; border-color: #ff4d4d; }
+		.red-btn:active { background: #ff4d4d; color: black; }
 
-        .ui-panel {
-            margin-bottom: 20px;
-            text-align: center;
-            height: 100px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            width: 400px;
-        }
+		.hidden { display: none !important; }
 
-        .hint-text {
-            color: #d32f2f;
-            margin-top: 10px;
-            font-size: 22px;
-            min-height: 30px;
-        }
+		.ui-panel {
+			margin-bottom: 20px;
+			text-align: center;
+			height: 100px;
+			font-size: 20px;
+			font-weight: bold;
+			color: #333;
+			width: 400px;
+		}
 
-        .restart-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background-color: #333;
-            color: white;
-            border: 2px solid #111;
-            cursor: pointer;
-            font-family: 'Retro', monospace;
-            font-size: 16px;
-        }
-        .restart-btn:hover { background-color: #555; }
-        .restart-btn:active { background-color: #000; }
-    </style>
+		.hint-text {
+			color: #d32f2f;
+			margin-top: 10px;
+			font-size: 22px;
+			min-height: 30px;
+		}
+
+		.restart-btn {
+			position: absolute;
+			bottom: 20px;
+			right: 20px;
+			padding: 10px 20px;
+			background-color: #333;
+			color: white;
+			border: 2px solid #111;
+			cursor: pointer;
+			font-family: 'Retro', monospace;
+			font-size: 16px;
+		}
+		.restart-btn:hover { background-color: #555; }
+		.restart-btn:active { background-color: #000; }
+
+		#lang-modal {
+			position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+			background-color: rgba(0, 0, 0, 0.95);
+			display: flex; flex-direction: column; align-items: center; justify-content: center;
+			z-index: 1000;
+		}
+
+		.lang-flag { width: 80px; height: 50px; border: 2px solid white; object-fit: cover; }
+		.lang-flag-small { width: 40px; height: 25px; border: 2px solid white; object-fit: cover; cursor: pointer; }
+
+		.flag-fallback, .flag-fallback-small {
+			display: inline-block;
+			background: black; color: black;
+			-webkit-text-stroke: 1px white;
+			font-family: 'Retro', monospace;
+			border: 2px solid white; text-align: center; box-sizing: border-box;
+		}
+		.flag-fallback {
+			width: 80px; height: 50px; line-height: 46px;
+			font-size: 32px; font-weight: bold;
+		}
+		.flag-fallback-small {
+			width: 40px; height: 25px; line-height: 21px;
+			font-size: 16px; font-weight: bold; cursor: pointer;
+		}
+	</style>
 </head>
 <body>
-
-    <div class="app-wrapper">
-        <div id="config-panel" class="lock-container hidden">
-            <div class="config-header">SYSTEM SETUP</div>
-            <div id="config-sections-container" class="config-sections-container"></div>
-
-            <div class="config-footer">
-                <div class="btn-row">
-                    <button id="btn-mode-all" class="retro-btn mode-all selected" onclick="setMode('ALL')">All</button>
-                    <button id="btn-mode-random" class="retro-btn mode-random" onclick="setMode('RANDOM')">Random</button>
-                    <button id="btn-mute" class="retro-btn btn-mute" onclick="toggleMute()">Mute</button>
-                </div>
-                <div class="btn-row">
-                    <button class="retro-btn" onclick="askCreateSection()">+ Section</button>
-                    <button class="retro-btn start-btn" onclick="startTraining()">START TRAINING</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="game-panel" class="game-panel hidden">
-            <div class="ui-panel">
-                <div id="category-name">Waiting...</div>
-                <div id="message-area"></div>
-                <div id="hint-area" class="hint-text hidden"></div>
-            </div>
-
-            <div class="lock-container" id="lock-box">
-                <div class="z-prompt" id="z-prompt">Z</div>
-                <div class="digits-display" id="digits-display"></div>
-            </div>
-        </div>
-    </div>
-
-    <button class="restart-btn" id="restart-btn">Full restart</button>
-
-    <script>
-        const sndMove = new Audio('Audio/001-System01.ogg');
-        const sndConfirm = new Audio('Audio/002-System02.ogg');
-        const sndRestart = new Audio('Audio/003-System03.ogg');
-        const sndUnavailable = new Audio('Audio/004-System04.ogg');
-
-        let isMuted = false;
-
-        function playSound(audioObj) {
-            if (isMuted || !audioObj) return;
-            audioObj.currentTime = 0;
-            audioObj.play().catch(() => {});
-        }
-
-        function showError(msg) {
-            playSound(sndUnavailable);
-            setTimeout(() => alert(msg), 15);
-        }
-
-        function findSolution(number, preferRight = true) {
-            if (!number) return "";
-            const arrowNotation = {
-                "0": "", "1": "↑", "2": "↑↑", "3": "↑↑↑", "4": "↑↑↑↑",
-                "5": "↑↑↑↑↑", "6": "↓↓↓↓", "7": "↓↓↓", "8": "↓↓", "9": "↓"
-            };
-
-            const l = number.split('').map(c => arrowNotation[c] || "");
-
-            // move_l
-            let move_l = l[0];
-            if (l.length > 1) {
-                let lRestReversed = l.slice(1).reverse();
-                move_l += "←" + lRestReversed.join("←");
-            }
-            move_l = move_l.replace(/[←→]+$/, '');
-
-            // move_r
-            let move_r = l.join("→").replace(/[←→]+$/, '');
-
-            let preferRightVal = preferRight ? 1 : 0;
-            let chosen = (move_r.length < move_l.length + preferRightVal) ? move_r : move_l;
-
-            return chosen + " Z";
-        }
-
-        let categories =[
-            {
-                name: "Piano",
-                isCollapsed: false,
-                codes:[
-                    { target: "6799", isActive: true },
-                    { target: "9761", isActive: true },
-                    { target: "6392", isActive: true },
-                    { target: "1416", isActive: true },
-                    { target: "5156", isActive: true }
-                ]
-            },
-            {
-                name: "Closet",
-                isCollapsed: false,
-                codes:[ { target: "5376", isActive: true } ]
-            },
-            {
-                name: "Safe",
-                isCollapsed: false,
-                codes:[
-                    { target: "290", isActive: true },
-                    { target: "361", isActive: true },
-                    { target: "528", isActive: true }
-                ]
-            },
-            {
-                name: "Iron door",
-                isCollapsed: false,
-                codes:[ { target: "1237", isActive: true } ]
-            },
-            {
-                name: "Another safe",
-                isCollapsed: false,
-                codes:[ { target: "3045", isActive: true } ]
-            }
-        ];
-
-        categories.forEach(cat => {
-            cat.codes.forEach(c => { c.hint = findSolution(c.target); });
-        });
-
-        let gameMode = 'ALL';
-
-        let currentCategoryIdx = 0;
-        let enteredCodes = [];
-        let digits =[];
-        let cursorPos = 0;
-
-        let state = 'CONFIG';
-        let blindMode = false;
-        let showHint = false;
-        let qHeld = false;
-
-        let startTime = 0;
-        let totalStartTime = 0;
-
-        const elConfigPanel = document.getElementById('config-panel');
-        const elGamePanel = document.getElementById('game-panel');
-        const elConfigContainer = document.getElementById('config-sections-container');
-
-        const elCategory = document.getElementById('category-name');
-        const elMessage = document.getElementById('message-area');
-        const elHint = document.getElementById('hint-area');
-        const elDigits = document.getElementById('digits-display');
-        const elZPrompt = document.getElementById('z-prompt');
-        const elLockBox = document.getElementById('lock-box');
-        const btnRestart = document.getElementById('restart-btn');
-
-        // ==========================================
-        //         CONFIGURATION LOGIC
-        // ==========================================
-
-        function toggleMute() {
-            isMuted = !isMuted;
-            const btn = document.getElementById('btn-mute');
-            btn.innerText = isMuted ? 'Unmute' : 'Mute';
-            btn.classList.toggle('muted', isMuted);
-
-            if (!isMuted) playSound(sndMove);
-        }
-
-        function setMode(mode) {
-            playSound(sndMove);
-            gameMode = mode;
-            document.getElementById('btn-mode-all').classList.toggle('selected', mode === 'ALL');
-            document.getElementById('btn-mode-random').classList.toggle('selected', mode === 'RANDOM');
-        }
-
-        window.toggleCollapse = function(cIdx) {
-            playSound(sndMove);
-            categories[cIdx].isCollapsed = !categories[cIdx].isCollapsed;
-            renderConfig();
-        };
-
-        function renderConfig() {
-            elConfigContainer.innerHTML = '';
-            categories.forEach((cat, cIdx) => {
-                let collapseIcon = cat.isCollapsed ? '[*]' : '[+]';
-                let secHtml = `
-                    <div class="config-section">
-                        <div class="sec-header">
-                            <div>
-                                <span class="collapse-icon" onclick="toggleCollapse(${cIdx})" title="Collapse/Expand">${collapseIcon}</span>
-                                <span>${cat.name}</span>
-                            </div>
-                            <div>
-                                <span class="icon-btn blue" onclick="askEditSection(${cIdx})" title="Rename section">✎</span>
-                                <span class="icon-btn blue" onclick="askAddCode(${cIdx})" title="Add code to section">➕</span>
-                                <span class="icon-btn red" onclick="askDeleteSection(${cIdx})" title="Delete section">✖</span>
-                            </div>
-                        </div>
-                `;
-
-                if (!cat.isCollapsed) {
-                    cat.codes.forEach((codeObj, codeIdx) => {
-                        let bulbClass = codeObj.isActive ? 'yellow' : 'gray';
-                        let hintStr = codeObj.hint ? ` <span style="color:#888;font-size:12px;">(${codeObj.hint})</span>` : '';
-                        secHtml += `
-                            <div class="code-row">
-                                <span>└─ ${codeObj.target}${hintStr}</span>
-                                <div>
-                                    <span class="icon-btn blue" onclick="askEditCode(${cIdx}, ${codeIdx})" title="Change code">✎</span>
-                                    <span class="icon-btn ${bulbClass}" onclick="toggleCodeActive(${cIdx}, ${codeIdx})" title="On/Off">💡</span>
-                                    <span class="icon-btn red" onclick="askDeleteCode(${cIdx}, ${codeIdx})" title="Remove code">✖</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                secHtml += `</div>`;
-                elConfigContainer.innerHTML += secHtml;
-            });
-        }
-
-        window.askEditSection = function(cIdx) {
-            playSound(sndMove);
-            let newVal = prompt("Enter a new section name :", categories[cIdx].name);
-            if(newVal !== null && newVal.trim() !== "") {
-                categories[cIdx].name = newVal.trim();
-                renderConfig();
-            }
-        };
-
-        window.askDeleteSection = function(cIdx) {
-            playSound(sndMove);
-            if(categories.length <= 1) return showError("Error! There must be at least one section.");
-            if(confirm(`Delete section '${categories[cIdx].name}'?`)) {
-                categories.splice(cIdx, 1);
-                renderConfig();
-            }
-        };
-
-        window.askEditCode = function(cIdx, codeIdx) {
-            playSound(sndMove);
-            let codeObj = categories[cIdx].codes[codeIdx];
-            let reqLen = categories[cIdx].codes[0].target.length;
-            let newCode = prompt(`Enter the code (strictly ${reqLen} digits) :`, codeObj.target);
-            if(newCode !== null) {
-                newCode = newCode.trim();
-                if(newCode.length !== reqLen) return showError(`Error! Code length must be ${reqLen}.`);
-                if(!/^\d+$/.test(newCode)) return showError("Error! Only numbers.");
-
-                codeObj.target = newCode;
-                codeObj.hint = findSolution(newCode);
-                renderConfig();
-            }
-        };
-
-        window.toggleCodeActive = function(cIdx, codeIdx) {
-            playSound(sndMove);
-            let codeObj = categories[cIdx].codes[codeIdx];
-            if(codeObj.isActive) {
-                let activeCount = categories[cIdx].codes.filter(c => c.isActive).length;
-                if(activeCount <= 1) return showError("Error! The section must contain at least one enabled code.");
-            }
-            codeObj.isActive = !codeObj.isActive;
-            renderConfig();
-        };
-
-        window.askDeleteCode = function(cIdx, codeIdx) {
-            playSound(sndMove);
-            if(categories[cIdx].codes.length <= 1) return showError("Error! You cannot delete the last code in a section.");
-            if(confirm("Remove this code?")) {
-                categories[cIdx].codes.splice(codeIdx, 1);
-                renderConfig();
-            }
-        };
-
-        window.askCreateSection = function() {
-            playSound(sndMove);
-            let name = prompt("Name of the new section :");
-            if(!name) return;
-            let lenStr = prompt("Code length (e.g. 4) :");
-            let len = parseInt(lenStr, 10);
-            if(isNaN(len) || len <= 0) return showError("Invalid length.");
-
-            let estimatedW = (len * 26) + 120;
-            if(estimatedW > window.innerWidth * 0.9) return showError("Error! The code is so long that it will extend beyond the screen.");
-
-            let code = prompt(`Enter the FIRST code (strictly ${len} digits) :`);
-            if(!code || code.length !== len || !/^\d+$/.test(code)) return showError(`Error! Need ${len} digits.`);
-
-            categories.push({
-                name: name.trim(),
-                isCollapsed: false,
-                randomTarget: null,
-                codes: [{ target: code.trim(), hint: findSolution(code.trim()), isActive: true }]
-            });
-            renderConfig();
-        };
-
-        window.askAddCode = function(cIdx) {
-            playSound(sndMove);
-            let reqLen = categories[cIdx].codes[0].target.length;
-            let newCode = prompt(`Enter the new code (strictly ${reqLen} digits) :`);
-            if(!newCode) return;
-            if(newCode.length !== reqLen || !/^\d+$/.test(newCode)) return showError(`Error! Need ${reqLen} digits.`);
-
-            categories[cIdx].codes.push({ target: newCode, hint: findSolution(newCode), isActive: true });
-            renderConfig();
-        };
-
-        // ==========================================
-        //         GAME LOGIC
-        // ==========================================
-
-        function initConfig() {
-            state = 'CONFIG';
-            elConfigPanel.classList.remove('hidden');
-            elGamePanel.classList.add('hidden');
-            renderConfig();
-        }
-
-        window.startTraining = function() {
-            playSound(sndConfirm); // Accept/Open menu sound
-            blindMode = qHeld;
-            state = 'WAITING_Z';
-            currentCategoryIdx = 0;
-            showHint = false;
-            totalStartTime = Date.now();
-
-            elConfigPanel.classList.add('hidden');
-            elGamePanel.classList.remove('hidden');
-            elMessage.innerText = "";
-            setupCategory();
-        };
-
-        function setupCategory() {
-            if (currentCategoryIdx >= categories.length) {
-                state = 'FINISHED';
-                elZPrompt.classList.add('hidden');
-                const totalTime = Date.now() - totalStartTime;
-                elCategory.innerText = "All Complete!";
-                elMessage.innerText = `Total time: ${totalTime} ms. Press Full Restart.`;
-                elDigits.innerHTML = "";
-                elHint.classList.add('hidden');
-                return;
-            }
-
-            state = 'WAITING_Z';
-            enteredCodes =[];
-            const category = categories[currentCategoryIdx];
-
-            const reqLen = category.codes[0].target.length;
-            const requiredWidth = Math.max(400, (reqLen * 26) + 120);
-            elLockBox.style.width = requiredWidth + 'px';
-
-            if (gameMode === 'RANDOM') {
-                const activeCodes = category.codes.filter(c => c.isActive);
-                const randIdx = Math.floor(Math.random() * activeCodes.length);
-                category.randomTarget = activeCodes[randIdx].target;
-            }
-
-            elZPrompt.classList.remove('hidden');
-            elCategory.innerText = `Category: ${category.name}`;
-            elHint.classList.add('hidden');
-            showHint = false;
-
-            resetDigits();
-        }
-
-        function resetDigits() {
-            const reqLen = categories[currentCategoryIdx].codes[0].target.length;
-            digits = Array(reqLen).fill(0);
-            cursorPos = 0;
-        }
-
-        function startInput() {
-            state = 'INPUTTING';
-            elZPrompt.classList.add('hidden');
-            startTime = Date.now();
-            render();
-        }
-
-        function render() {
-            if (state === 'FINISHED' || state === 'WAITING_Z' || state === 'CONFIG') return;
-
-            elDigits.innerHTML = "";
-            for (let i = 0; i < digits.length; i++) {
-                const block = document.createElement('div');
-                block.className = 'digit-block';
-
-                const cursor = document.createElement('div');
-                cursor.className = 'cursor';
-                if (i !== cursorPos) cursor.classList.add('hidden-cursor');
-                cursor.innerText = '▸';
-
-                const digit = document.createElement('div');
-                digit.className = 'digit';
-                digit.innerText = blindMode ? " " : digits[i];
-
-                block.appendChild(cursor);
-                block.appendChild(digit);
-                elDigits.appendChild(block);
-            }
-
-            if (showHint) {
-                const category = categories[currentCategoryIdx];
-                const activeCodes = category.codes.filter(c => c.isActive);
-                const unenteredCodes = activeCodes.filter(c => !enteredCodes.includes(c.target));
-
-                if (unenteredCodes.length > 0) {
-                    unenteredCodes.sort((a, b) => (a.hint || "").length - (b.hint || "").length);
-                    elHint.innerText = unenteredCodes[0].hint || "";
-                } else {
-                    elHint.innerText = "";
-                }
-                elHint.classList.remove('hidden');
-            } else {
-                elHint.classList.add('hidden');
-            }
-        }
-
-        function checkConfirm() {
-            const currentInput = digits.join('');
-            const category = categories[currentCategoryIdx];
-            const activeCodes = category.codes.filter(c => c.isActive);
-            const matchedCode = activeCodes.find(c => c.target === currentInput);
-
-            playSound(sndConfirm);
-
-            if (matchedCode && !enteredCodes.includes(currentInput)) {
-                enteredCodes.push(currentInput);
-                showHint = false;
-
-                if (gameMode === 'RANDOM') {
-                    if (currentInput === category.randomTarget) {
-                        const timeTaken = Date.now() - startTime;
-                        elMessage.innerText = `Good! ${timeTaken} ms`;
-                        currentCategoryIdx++;
-                        setupCategory();
-                    } else {
-                        elMessage.innerText = "Good, but not this one.";
-                        resetDigits();
-                        render();
-                    }
-                } else {
-                    if (enteredCodes.length < activeCodes.length) {
-                        elMessage.innerText = "Okay. Next.";
-                        resetDigits();
-                        render();
-                    } else {
-                        const timeTaken = Date.now() - startTime;
-                        elMessage.innerText = `Good! ${timeTaken} ms`;
-                        currentCategoryIdx++;
-                        setupCategory();
-                    }
-                }
-            } else {
-                elMessage.innerText = "Wrong!";
-                resetDigits();
-                render();
-            }
-        }
-
-        window.addEventListener('keydown', (e) => {
-            const isQ = e.code === 'KeyQ' || /^q|й$/i.test(e.key);
-            if (isQ) qHeld = true;
-
-            if (e.repeat) return;
-
-            const isConfirm = e.code === 'KeyZ' || e.code === 'KeyC' || e.code === 'Enter' || e.code === 'NumpadEnter' || /^z|c|я|с|enter$/i.test(e.key);
-            const isHint = e.code === 'KeyH' || /^h|р$/i.test(e.key);
-
-            if (state === 'WAITING_Z') {
-                if (isConfirm) {
-                    playSound(sndConfirm);
-                    startInput();
-                }
-                return;
-            }
-
-            if (state === 'INPUTTING') {
-                if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    cursorPos = (cursorPos - 1 + digits.length) % digits.length;
-                    playSound(sndMove);
-                    render();
-                }
-                else if (e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    cursorPos = (cursorPos + 1) % digits.length;
-                    playSound(sndMove);
-                    render();
-                }
-                else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    digits[cursorPos] = (digits[cursorPos] + 1) % 10;
-                    playSound(sndMove);
-                    render();
-                }
-                else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    digits[cursorPos] = (digits[cursorPos] - 1 + 10) % 10;
-                    playSound(sndMove);
-                    render();
-                }
-                else if (isConfirm) {
-                    e.preventDefault();
-                    checkConfirm();
-                }
-                else if (isHint) {
-                    e.preventDefault();
-                    showHint = !showHint;
-                    render();
-                }
-            }
-        });
-
-        window.addEventListener('keyup', (e) => {
-            const isQ = e.code === 'KeyQ' || /^q|й$/i.test(e.key);
-            if (isQ) qHeld = false;
-        });
-
-        btnRestart.addEventListener('click', () => {
-            playSound(sndRestart); // Cancel/Close menu
-            initConfig();
-        });
-
-        initConfig();
-
-    </script>
+	<div class="top-left-controls" id="top-left-controls">
+		<div id="btn-lang-top" onclick="showLangModal()" title="Change Language"></div>
+	</div>
+
+	<div id="lang-modal" class="hidden">
+		<h2 style="font-family: 'Retro', monospace; text-align: center; margin-bottom: 40px; color: white;">Please select a language</h2>
+		<div style="display: flex; gap: 40px;">
+			<div onclick="selectLang('en')" style="cursor: pointer; text-align: center;">
+				<img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>EN</span>'">
+				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">English</div>
+			</div>
+			<div onclick="selectLang('jp')" style="cursor: pointer; text-align: center;">
+				<img src="https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>JP</span>'">
+				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">日本語</div>
+			</div>
+			<div onclick="selectLang('zh')" style="cursor: pointer; text-align: center;">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>ZH</span>'">
+				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">中文</div>
+			</div>
+			<div onclick="selectLang('ko')" style="cursor: pointer; text-align: center;">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>KO</span>'">
+				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">한국어</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="app-wrapper">
+		<div id="config-panel" class="lock-container hidden">
+			<div class="config-header" id="config-header-text">SYSTEM SETUP</div>
+			<div id="config-sections-container" class="config-sections-container"></div>
+
+			<div class="config-footer">
+				<div class="btn-row">
+					<button id="btn-mode-all" class="retro-btn mode-all selected" onclick="setMode('ALL')">All</button>
+					<button id="btn-mode-random" class="retro-btn mode-random" onclick="setMode('RANDOM')">Random</button>
+					<button id="btn-mute" class="retro-btn btn-mute" onclick="toggleMute()">Mute</button>
+				</div>
+				<div class="btn-row">
+					<button id="btn-add-sec" class="retro-btn" onclick="askCreateSection()">+ Section</button>
+					<button id="btn-start" class="retro-btn start-btn" onclick="startTraining()">START TRAINING</button>
+				</div>
+				<div class="btn-row" style="margin-top: 15px;">
+					<button id="btn-hard-reset" class="retro-btn red-btn" onclick="onHardResetClick()">Hard Reset</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="game-panel" class="game-panel hidden">
+			<div class="ui-panel">
+				<div id="category-name">Waiting...</div>
+				<div id="message-area"></div>
+				<div id="hint-area" class="hint-text hidden"></div>
+			</div>
+
+			<div class="lock-container" id="lock-box">
+				<div class="z-prompt" id="z-prompt">Z</div>
+				<div class="digits-display" id="digits-display"></div>
+			</div>
+		</div>
+	</div>
+
+	<button class="restart-btn" id="restart-btn">Full restart</button>
+
+	<script>
+		const I18N = {
+			en: {
+				setup: "SYSTEM SETUP", modeAll: "All", modeRand: "Random", mute: "Mute", unmute: "Unmute",
+				addSec: "+ Section", start: "START TRAINING", restart: "Full restart", hardReset: "Hard Reset",
+				cat: "Category", total: "Total time", ms: "ms", waiting: "Waiting...",
+				wrong: "Wrong!", next: "Okay. Next.", good: "Good!", goodBut: "Good, but not this one.",
+				promptNewSec: "Enter a new section name:", promptLen: "Code length (e.g. 4):",
+				errLen: "Invalid length.", errTooLong: "Error! The code is so long that it will extend beyond the screen.",
+				promptCodeFirst: "Enter the FIRST code (strictly {0} digits):",
+				promptCodeNew: "Enter the new code (strictly {0} digits):",
+				promptCodeEdit: "Enter the code (strictly {0} digits):",
+				errDigits: "Error! Only numbers.", errDigitsLen: "Error! Need exactly {0} digits.",
+				errActive: "Error! The section must contain at least one enabled code.",
+				errLastCode: "Error! You cannot delete the last code in a section.",
+				confirmDelSec: "Delete section '{0}'?", confirmDelCode: "Remove this code?",
+				errNeedSec: "Error! There must be at least one section.",
+				allComplete: "All Complete!", completeMsg: "Total time: {0} ms. Press Full Restart.",
+				promptRename: "Enter a new section name:"
+			},
+			jp: {
+				setup: "システム設定", modeAll: "すべて", modeRand: "ランダム", mute: "消音", unmute: "消音解除",
+				addSec: "+ セクション", start: "トレーニング開始", restart: "再起動", hardReset: "完全初期化",
+				cat: "カテゴリ", total: "合計時間", ms: "ミリ秒", waiting: "待機中...",
+				wrong: "間違い！", next: "正解。次へ。", good: "合格！", goodBut: "正解ですが、これではありません。",
+				promptNewSec: "新しいセクション名を入力:", promptLen: "コードの長さ（例: 4）:",
+				errLen: "無効な長さです。", errTooLong: "エラー！コードが長すぎて画面に収まりません。",
+				promptCodeFirst: "最初のコードを入力してください（厳密に {0} 桁）:",
+				promptCodeNew: "新しいコードを入力してください（厳密に {0} 桁）:",
+				promptCodeEdit: "コードを入力してください（厳密に {0} 桁）:",
+				errDigits: "エラー！数字のみ入力可能です。", errDigitsLen: "エラー！厳密に {0} 桁必要です。",
+				errActive: "エラー！有効なコードが少なくとも1つ必要です。",
+				errLastCode: "エラー！最後のコードは削除できません。",
+				confirmDelSec: "セクション '{0}' を削除しますか？", confirmDelCode: "このコードを削除しますか？",
+				errNeedSec: "エラー！少なくとも1つのセクションが必要です。",
+				allComplete: "すべて完了！", completeMsg: "合計時間: {0} ミリ秒。再起動してください。",
+				promptRename: "新しいセクション名を入力:"
+			},
+			zh: {
+				setup: "系统设置", modeAll: "全部", modeRand: "随机", mute: "静音", unmute: "取消静音",
+				addSec: "+ 添加部分", start: "开始训练", restart: "完全重启", hardReset: "硬重置",
+				cat: "类别", total: "总时间", ms: "毫秒", waiting: "等待中...",
+				wrong: "错误！", next: "正确。下一个。", good: "太棒了！", goodBut: "正确，但不是这个。",
+				promptNewSec: "输入新的部分名称:", promptLen: "代码长度（例如：4）:",
+				errLen: "长度无效。", errTooLong: "错误！代码太长，会超出屏幕范围。",
+				promptCodeFirst: "输入第一个代码（严格 {0} 位数字）:",
+				promptCodeNew: "输入新代码（严格 {0} 位数字）:",
+				promptCodeEdit: "输入代码（严格 {0} 位数字）:",
+				errDigits: "错误！只能输入数字。", errDigitsLen: "错误！需要精确 {0} 位数字。",
+				errActive: "错误！该部分必须至少包含一个已启用的代码。",
+				errLastCode: "错误！您不能删除部分中的最后一个代码。",
+				confirmDelSec: "删除部分 '{0}' 吗？", confirmDelCode: "删除此代码吗？",
+				errNeedSec: "错误！必须至少有一个部分。",
+				allComplete: "全部完成！", completeMsg: "总时间: {0} 毫秒。请按完全重启。",
+				promptRename: "输入新的部分名称:"
+			},
+			ko: {
+				setup: "시스템 설정", modeAll: "모두", modeRand: "랜덤", mute: "음소거", unmute: "음소거 해제",
+				addSec: "+ 섹션 추가", start: "훈련 시작", restart: "전체 재시작", hardReset: "초기화",
+				cat: "카테고리", total: "총 시간", ms: "밀리초", waiting: "대기 중...",
+				wrong: "오답!", next: "정답. 다음.", good: "좋습니다!", goodBut: "정답이지만, 이건 아닙니다.",
+				promptNewSec: "새 섹션 이름을 입력하세요:", promptLen: "코드 길이 (예: 4):",
+				errLen: "잘못된 길이입니다.", errTooLong: "오류! 코드가 너무 길어 화면을 벗어납니다.",
+				promptCodeFirst: "첫 번째 코드를 입력하세요 (정확히 {0}자리):",
+				promptCodeNew: "새 코드를 입력하세요 (정확히 {0}자리):",
+				promptCodeEdit: "코드를 입력하세요 (정확히 {0}자리):",
+				errDigits: "오류! 숫자만 입력 가능합니다.", errDigitsLen: "오류! 정확히 {0}자리가 필요합니다.",
+				errActive: "오류! 활성화된 코드가 하나 이상 있어야 합니다.",
+				errLastCode: "오류! 마지막 코드는 삭제할 수 없습니다.",
+				confirmDelSec: "'{0}' 섹션을 삭제하시겠습니까?", confirmDelCode: "이 코드를 삭제하시겠습니까?",
+				errNeedSec: "오류! 섹션이 최소 하나는 있어야 합니다.",
+				allComplete: "모두 완료!", completeMsg: "총 시간: {0} 밀리초. 전체 재시작을 누르세요.",
+				promptRename: "새 섹션 이름을 입력하세요:"
+			}
+		};
+
+		let curLang = 'en'; 
+		const t = (key, ...args) => {
+			let str = (I18N[curLang] && I18N[curLang][key]) || (I18N['en'][key]) || key;
+			args.forEach((arg, i) => { str = str.replace(`{${i}}`, arg); });
+			return str;
+		};
+		
+		const $ = id => document.getElementById(id);
+		
+		const sndMove = new Audio('Audio/001-System01.ogg');
+		const sndConfirm = new Audio('Audio/002-System02.ogg');
+		const sndRestart = new Audio('Audio/003-System03.ogg');
+		const sndUnavailable = new Audio('Audio/004-System04.ogg');
+
+		let isMuted = false;
+
+		function playSound(audioObj) {
+			if (isMuted || !audioObj) return;
+			audioObj.currentTime = 0;
+			audioObj.play().catch(() => {});
+		}
+
+		function showError(msg) {
+			playSound(sndUnavailable);
+			setTimeout(() => alert(msg), 15);
+		}
+
+		// ==========================================
+		//		 DATA & STORAGE LOGIC
+		// ==========================================
+
+		const defaultCategories =[
+			{
+				name: "Piano", isCollapsed: false,
+				codes:[ { target: "6799", isActive: true }, { target: "9761", isActive: true }, { target: "6392", isActive: true }, { target: "1416", isActive: true }, { target: "5156", isActive: true } ]
+			},
+			{
+				name: "Closet", isCollapsed: false,
+				codes:[ { target: "5376", isActive: true } ]
+			},
+			{
+				name: "Safe", isCollapsed: false,
+				codes:[ { target: "290", isActive: true }, { target: "361", isActive: true }, { target: "528", isActive: true } ]
+			},
+			{
+				name: "Iron door", isCollapsed: false,
+				codes:[ { target: "1237", isActive: true } ]
+			},
+			{
+				name: "Another safe", isCollapsed: false,
+				codes:[ { target: "3045", isActive: true } ]
+			}
+		];
+
+		let categories =[];
+
+		function populateHints(cats) {
+			cats.forEach(cat => {
+				cat.codes.forEach(c => { c.hint = findSolution(c.target); });
+			});
+		}
+
+		function saveData() {
+			try {
+				localStorage.setItem('aoOniLang', curLang);
+				localStorage.setItem('aoOniCategories', JSON.stringify(categories));
+			} catch(e) { console.error("Save error", e); }
+		}
+
+		function loadData() {
+			try {
+				const savedLang = localStorage.getItem('aoOniLang');
+				const savedCats = localStorage.getItem('aoOniCategories');
+				if (savedLang) curLang = savedLang;
+				if (savedCats) {
+					categories = JSON.parse(savedCats);
+				} else {
+					categories = JSON.parse(JSON.stringify(defaultCategories));
+				}
+				populateHints(categories);
+			} catch(e) {
+				categories = JSON.parse(JSON.stringify(defaultCategories));
+				populateHints(categories);
+			}
+		}
+
+		let isInitMode = false;
+
+		function initApp() {
+			populateHints(defaultCategories);
+			const savedLang = localStorage.getItem('aoOniLang');
+			if (!savedLang) {
+				categories = JSON.parse(JSON.stringify(defaultCategories));
+				populateHints(categories);
+				isInitMode = true;
+				showLangModal();
+			} else {
+				loadData();
+				updateUILocale();
+				updateTopLeftFlag();
+				initConfig();
+			}
+		}
+
+		function showLangModal() {
+			$('lang-modal').classList.remove('hidden');
+		}
+
+		window.selectLang = function(langCode) {
+			playSound(sndConfirm);
+			curLang = langCode;
+			saveData();
+			updateUILocale();
+			updateTopLeftFlag();
+			$('lang-modal').classList.add('hidden');
+
+			if (isInitMode) {
+				isInitMode = false;
+				initConfig();
+			} else {
+				if (state === 'CONFIG') renderConfig();
+			}
+		};
+
+		function updateTopLeftFlag() {
+			const flagMap = {
+				en: "https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg",
+				jp: "https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg",
+				zh: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
+				ko: "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg"
+			};
+			const fName = curLang.toUpperCase();
+			$('btn-lang-top').innerHTML = `<img src="${flagMap[curLang]}" class="lang-flag-small" onerror="this.outerHTML='<span class=\\'flag-fallback-small\\'>${fName}</span>'">`;
+		}
+
+		function updateUILocale() {
+			$('config-header-text').innerText = t('setup');
+			$('btn-mode-all').innerText = t('modeAll');
+			$('btn-mode-random').innerText = t('modeRand');
+			$('btn-mute').innerText = isMuted ? t('unmute') : t('mute');
+			$('btn-add-sec').innerText = t('addSec');
+			$('btn-start').innerText = t('start');
+			$('restart-btn').innerText = t('restart');
+			$('btn-hard-reset').innerText = t('hardReset');
+
+			if (state === 'FINISHED') {
+				elCategory.innerText = t('allComplete');
+			} else if (state === 'WAITING_Z') {
+				if (categories[currentCategoryIdx]) {
+					elCategory.innerText = `${t('cat')}: ${categories[currentCategoryIdx].name}`;
+				}
+			}
+		}
+
+		let hrClicks = 0;
+		let hrTimeout = null;
+
+		window.onHardResetClick = function() {
+			hrClicks++;
+			playSound(sndMove);
+			if(hrTimeout) clearTimeout(hrTimeout);
+
+			const btn = $('btn-hard-reset');
+			
+			if(hrClicks >= 5) {
+				hrClicks = 0;
+				btn.innerText = t('hardReset');
+				playSound(sndRestart);
+				performHardReset();
+			} else {
+				btn.innerText = `[ ${5 - hrClicks} ]`;
+				hrTimeout = setTimeout(() => { 
+					hrClicks = 0; 
+					btn.innerText = t('hardReset');
+				}, 800);
+			}
+		};
+
+		function performHardReset() {
+			localStorage.removeItem('aoOniLang');
+			localStorage.removeItem('aoOniCategories');
+			categories = JSON.parse(JSON.stringify(defaultCategories));
+			populateHints(categories);
+			isInitMode = true;
+			
+			elConfigPanel.classList.add('hidden');
+			elGamePanel.classList.add('hidden');
+			showLangModal();
+		}
+
+		// ==========================================
+		//		 ALGORITHM
+		// ==========================================
+
+		function findSolution(number) {
+			if (!number) return "Z";
+			const arrowNotation = { "0": "", "1": "↑", "2": "↑↑", "3": "↑↑↑", "4": "↑↑↑↑", "5": "↑↑↑↑↑", "6": "↓↓↓↓", "7": "↓↓↓", "8": "↓↓", "9": "↓" };
+			const n = number.length;
+			const targets =[];
+			for (let i = 0; i < n; i++) { if (number[i] !== '0') targets.push(i); }
+			if (targets.length === 0) return "Z";
+
+			let targetMask = 0;
+			for (const t of targets) targetMask |= (1 << t);
+
+			const startPos = 0;
+			const startMask = (number[0] !== '0') ? (1 << 0) : 0;
+			const startPath = arrowNotation[number[0]];
+
+			let queue = [[startPos, startMask, startPath]];
+			const visited = new Set();
+			visited.add(`${startPos}_${startMask}`);
+
+			let head = 0;
+			while (head < queue.length) {
+				const [pos, mask, path] = queue[head++];
+				if (mask === targetMask) return path + " Z";
+				
+				const moves =[ { char: "→", step: 1 }, { char: "←", step: -1 } ];
+				for (const move of moves) {
+					let newPos = (pos + move.step + n) % n;
+					let addedArrows = "";
+					let newMask = mask;
+
+					if (number[newPos] !== '0' && !(mask & (1 << newPos))) {
+						addedArrows = arrowNotation[number[newPos]];
+						newMask |= (1 << newPos);
+					}
+					const newPath = path + move.char + addedArrows;
+					const stateKey = `${newPos}_${newMask}`;
+					if (!visited.has(stateKey)) {
+						visited.add(stateKey);
+						queue.push([newPos, newMask, newPath]);
+					}
+				}
+			}
+			return "Z";
+		}
+
+		let gameMode = 'ALL';
+		let currentCategoryIdx = 0;
+		let enteredCodes = [];
+		let digits =[];
+		let cursorPos = 0;
+
+		let state = 'CONFIG';
+		let blindMode = false;
+		let showHint = false;
+		let qHeld = false;
+
+		let startTime = 0;
+		let totalStartTime = 0;
+
+		const elConfigPanel = $('config-panel');
+		const elGamePanel = $('game-panel');
+		const elConfigContainer = $('config-sections-container');
+
+		const elCategory = $('category-name');
+		const elMessage = $('message-area');
+		const elHint = $('hint-area');
+		const elDigits = $('digits-display');
+		const elZPrompt = $('z-prompt');
+		const elLockBox = $('lock-box');
+		const btnRestart = $('restart-btn');
+
+		// ==========================================
+		//		 CONFIGURATION LOGIC
+		// ==========================================
+
+		function toggleMute() {
+			isMuted = !isMuted;
+			const btn = $('btn-mute');
+			btn.innerText = isMuted ? t('unmute') : t('mute');
+			btn.classList.toggle('muted', isMuted);
+			if (!isMuted) playSound(sndMove);
+		}
+
+		function setMode(mode) {
+			playSound(sndMove);
+			gameMode = mode;
+			$('btn-mode-all').classList.toggle('selected', mode === 'ALL');
+			$('btn-mode-random').classList.toggle('selected', mode === 'RANDOM');
+		}
+
+		window.toggleCollapse = function(cIdx) {
+			playSound(sndMove);
+			categories[cIdx].isCollapsed = !categories[cIdx].isCollapsed;
+			saveData();
+			renderConfig();
+		};
+
+		function renderConfig() {
+			elConfigContainer.innerHTML = '';
+			categories.forEach((cat, cIdx) => {
+				let collapseIcon = cat.isCollapsed ? '[*]' : '[+]';
+				let secHtml = `
+					<div class="config-section">
+						<div class="sec-header">
+							<div>
+								<span class="collapse-icon" onclick="toggleCollapse(${cIdx})" title="Collapse/Expand">${collapseIcon}</span>
+								<span>${cat.name}</span>
+							</div>
+							<div>
+								<span class="icon-btn blue" onclick="askEditSection(${cIdx})" title="Rename section">✎</span>
+								<span class="icon-btn blue" onclick="askAddCode(${cIdx})" title="Add code to section">➕</span>
+								<span class="icon-btn red" onclick="askDeleteSection(${cIdx})" title="Delete section">✖</span>
+							</div>
+						</div>
+				`;
+
+				if (!cat.isCollapsed) {
+					cat.codes.forEach((codeObj, codeIdx) => {
+						let bulbClass = codeObj.isActive ? 'yellow' : 'gray';
+						let hintStr = codeObj.hint ? ` <span style="color:#888;font-size:12px;">(${codeObj.hint})</span>` : '';
+						secHtml += `
+							<div class="code-row">
+								<span>└─ ${codeObj.target}${hintStr}</span>
+								<div>
+									<span class="icon-btn blue" onclick="askEditCode(${cIdx}, ${codeIdx})" title="Change code">✎</span>
+									<span class="icon-btn ${bulbClass}" onclick="toggleCodeActive(${cIdx}, ${codeIdx})" title="On/Off">💡</span>
+									<span class="icon-btn red" onclick="askDeleteCode(${cIdx}, ${codeIdx})" title="Remove code">✖</span>
+								</div>
+							</div>
+						`;
+					});
+				}
+				secHtml += `</div>`;
+				elConfigContainer.innerHTML += secHtml;
+			});
+		}
+
+		window.askEditSection = function(cIdx) {
+			playSound(sndMove);
+			let newVal = prompt(t('promptRename'), categories[cIdx].name);
+			if(newVal !== null && newVal.trim() !== "") {
+				categories[cIdx].name = newVal.trim();
+				saveData();
+				renderConfig();
+			}
+		};
+
+		window.askDeleteSection = function(cIdx) {
+			playSound(sndMove);
+			if(categories.length <= 1) return showError(t('errNeedSec'));
+			if(confirm(t('confirmDelSec', categories[cIdx].name))) {
+				categories.splice(cIdx, 1);
+				saveData();
+				renderConfig();
+			}
+		};
+
+		window.askEditCode = function(cIdx, codeIdx) {
+			playSound(sndMove);
+			let codeObj = categories[cIdx].codes[codeIdx];
+			let reqLen = categories[cIdx].codes[0].target.length;
+			let newCode = prompt(t('promptCodeEdit', reqLen), codeObj.target);
+			if(newCode !== null) {
+				newCode = newCode.trim();
+				if(newCode.length !== reqLen) return showError(t('errDigitsLen', reqLen));
+				if(!/^\d+$/.test(newCode)) return showError(t('errDigits'));
+
+				codeObj.target = newCode;
+				codeObj.hint = findSolution(newCode);
+				saveData();
+				renderConfig();
+			}
+		};
+
+		window.toggleCodeActive = function(cIdx, codeIdx) {
+			playSound(sndMove);
+			let codeObj = categories[cIdx].codes[codeIdx];
+			if(codeObj.isActive) {
+				let activeCount = categories[cIdx].codes.filter(c => c.isActive).length;
+				if(activeCount <= 1) return showError(t('errActive'));
+			}
+			codeObj.isActive = !codeObj.isActive;
+			saveData();
+			renderConfig();
+		};
+
+		window.askDeleteCode = function(cIdx, codeIdx) {
+			playSound(sndMove);
+			if(categories[cIdx].codes.length <= 1) return showError(t('errLastCode'));
+			if(confirm(t('confirmDelCode'))) {
+				categories[cIdx].codes.splice(codeIdx, 1);
+				saveData();
+				renderConfig();
+			}
+		};
+
+		window.askCreateSection = function() {
+			playSound(sndMove);
+			let name = prompt(t('promptNewSec'));
+			if(!name) return;
+			let lenStr = prompt(t('promptLen'));
+			let len = parseInt(lenStr, 10);
+			if(isNaN(len) || len <= 0) return showError(t('errLen'));
+
+			let estimatedW = (len * 26) + 120;
+			if(estimatedW > window.innerWidth * 0.9) return showError(t('errTooLong'));
+
+			let code = prompt(t('promptCodeFirst', len));
+			if(!code || code.length !== len || !/^\d+$/.test(code)) return showError(t('errDigitsLen', len));
+
+			categories.push({
+				name: name.trim(),
+				isCollapsed: false,
+				randomTarget: null,
+				codes:[{ target: code.trim(), hint: findSolution(code.trim()), isActive: true }]
+			});
+			saveData();
+			renderConfig();
+		};
+
+		window.askAddCode = function(cIdx) {
+			playSound(sndMove);
+			let reqLen = categories[cIdx].codes[0].target.length;
+			let newCode = prompt(t('promptCodeNew', reqLen));
+			if(!newCode) return;
+			if(newCode.length !== reqLen || !/^\d+$/.test(newCode)) return showError(t('errDigitsLen', reqLen));
+
+			categories[cIdx].codes.push({ target: newCode, hint: findSolution(newCode), isActive: true });
+			saveData();
+			renderConfig();
+		};
+
+		// ==========================================
+		//		 GAME LOGIC
+		// ==========================================
+
+		function initConfig() {
+			state = 'CONFIG';
+			elConfigPanel.classList.remove('hidden');
+			elGamePanel.classList.add('hidden');
+			renderConfig();
+		}
+
+		window.startTraining = function() {
+			playSound(sndConfirm); 
+			blindMode = qHeld;
+			state = 'WAITING_Z';
+			currentCategoryIdx = 0;
+			showHint = false;
+			totalStartTime = Date.now();
+
+			elConfigPanel.classList.add('hidden');
+			elGamePanel.classList.remove('hidden');
+			elMessage.innerText = "";
+			setupCategory();
+		};
+
+		function setupCategory() {
+			if (currentCategoryIdx >= categories.length) {
+				state = 'FINISHED';
+				elZPrompt.classList.add('hidden');
+				const totalTime = Date.now() - totalStartTime;
+				elCategory.innerText = t('allComplete');
+				elMessage.innerText = t('completeMsg', totalTime);
+				elDigits.innerHTML = "";
+				elHint.classList.add('hidden');
+				return;
+			}
+
+			state = 'WAITING_Z';
+			enteredCodes =[];
+			const category = categories[currentCategoryIdx];
+
+			const reqLen = category.codes[0].target.length;
+			const requiredWidth = Math.max(400, (reqLen * 26) + 120);
+			elLockBox.style.width = requiredWidth + 'px';
+
+			if (gameMode === 'RANDOM') {
+				const activeCodes = category.codes.filter(c => c.isActive);
+				const randIdx = Math.floor(Math.random() * activeCodes.length);
+				category.randomTarget = activeCodes[randIdx].target;
+			}
+
+			elZPrompt.classList.remove('hidden');
+			elCategory.innerText = `${t('cat')}: ${category.name}`;
+			elHint.classList.add('hidden');
+			showHint = false;
+
+			resetDigits();
+		}
+
+		function resetDigits() {
+			const reqLen = categories[currentCategoryIdx].codes[0].target.length;
+			digits = Array(reqLen).fill(0);
+			cursorPos = 0;
+		}
+
+		function startInput() {
+			state = 'INPUTTING';
+			elZPrompt.classList.add('hidden');
+			startTime = Date.now();
+			render();
+		}
+
+		function render() {
+			if (state === 'FINISHED' || state === 'WAITING_Z' || state === 'CONFIG') return;
+
+			elDigits.innerHTML = "";
+			for (let i = 0; i < digits.length; i++) {
+				const block = document.createElement('div');
+				block.className = 'digit-block';
+
+				const cursor = document.createElement('div');
+				cursor.className = 'cursor';
+				if (i !== cursorPos) cursor.classList.add('hidden-cursor');
+				cursor.innerText = '▸';
+
+				const digit = document.createElement('div');
+				digit.className = 'digit';
+				digit.innerText = blindMode ? " " : digits[i];
+
+				block.appendChild(cursor);
+				block.appendChild(digit);
+				elDigits.appendChild(block);
+			}
+
+			if (showHint) {
+				const category = categories[currentCategoryIdx];
+				const activeCodes = category.codes.filter(c => c.isActive);
+				const unenteredCodes = activeCodes.filter(c => !enteredCodes.includes(c.target));
+
+				if (unenteredCodes.length > 0) {
+					unenteredCodes.sort((a, b) => (a.hint || "").length - (b.hint || "").length);
+					elHint.innerText = unenteredCodes[0].hint || "";
+				} else {
+					elHint.innerText = "";
+				}
+				elHint.classList.remove('hidden');
+			} else {
+				elHint.classList.add('hidden');
+			}
+		}
+
+		function checkConfirm() {
+			const currentInput = digits.join('');
+			const category = categories[currentCategoryIdx];
+			const activeCodes = category.codes.filter(c => c.isActive);
+			const matchedCode = activeCodes.find(c => c.target === currentInput);
+
+			playSound(sndConfirm);
+
+			if (matchedCode && !enteredCodes.includes(currentInput)) {
+				enteredCodes.push(currentInput);
+				showHint = false;
+
+				if (gameMode === 'RANDOM') {
+					if (currentInput === category.randomTarget) {
+						const timeTaken = Date.now() - startTime;
+						elMessage.innerText = `${t('good')} ${timeTaken} ${t('ms')}`;
+						currentCategoryIdx++;
+						setupCategory();
+					} else {
+						elMessage.innerText = t('goodBut');
+						resetDigits();
+						render();
+					}
+				} else {
+					if (enteredCodes.length < activeCodes.length) {
+						elMessage.innerText = t('next');
+						resetDigits();
+						render();
+					} else {
+						const timeTaken = Date.now() - startTime;
+						elMessage.innerText = `${t('good')} ${timeTaken} ${t('ms')}`;
+						currentCategoryIdx++;
+						setupCategory();
+					}
+				}
+			} else {
+				elMessage.innerText = t('wrong');
+				resetDigits();
+				render();
+			}
+		}
+
+		window.addEventListener('keydown', (e) => {
+			const { code } = e;
+			const isConfirm =["KeyZ", "KeyC", "Enter", "NumpadEnter"].includes(code);
+			const isHint = code === "KeyH";
+			const isQ = code === "KeyQ";
+
+			if (isQ) qHeld = true;
+			if (e.repeat) return;
+
+			if (state === 'WAITING_Z' && isConfirm) {
+				playSound(sndConfirm);
+				startInput();
+				return;
+			}
+
+			if (state === 'INPUTTING') {
+				const move = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+				const change = { ArrowUp: 1, ArrowDown: -1 }[e.key];
+
+				if (move !== undefined) {
+					e.preventDefault();
+					cursorPos = (cursorPos + move + digits.length) % digits.length;
+					playSound(sndMove);
+				} else if (change !== undefined) {
+					e.preventDefault();
+					digits[cursorPos] = (digits[cursorPos] + change + 10) % 10;
+					playSound(sndMove);
+				} else if (isConfirm) {
+					e.preventDefault();
+					checkConfirm();
+				} else if (isHint) {
+					e.preventDefault();
+					showHint = !showHint;
+				}
+				render();
+			}
+		});
+
+		window.addEventListener('keyup', (e) => {
+			const isQ = e.code === 'KeyQ' || /^q|й$/i.test(e.key);
+			if (isQ) qHeld = false;
+		});
+
+		btnRestart.addEventListener('click', () => {
+			playSound(sndRestart); 
+			initConfig();
+		});
+
+		initApp();
+	</script>
 </body>
 </html>
