@@ -993,7 +993,7 @@
 
 		window.addEventListener('keydown', (e) => {
 			const { code } = e;
-			const isConfirm =["KeyZ", "KeyC", "Enter", "NumpadEnter"].includes(code);
+			const isConfirm = ["KeyZ", "KeyC", "Enter", "NumpadEnter"].includes(code);
 			const isHint = code === "KeyH";
 			const isQ = code === "KeyQ";
 
@@ -1030,8 +1030,7 @@
 		});
 
 		window.addEventListener('keyup', (e) => {
-			const isQ = e.code === 'KeyQ' || /^q|й$/i.test(e.key);
-			if (isQ) qHeld = false;
+			if (e.code === 'KeyQ') qHeld = false;
 		});
 
 		btnRestart.addEventListener('click', () => {
