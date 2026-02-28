@@ -207,7 +207,7 @@
 		.btn-mute.muted { background: #ccc; color: black; }
 
 		.start-btn { color: #fff; border-color: #fff; background: #222; }
-		
+
 		.red-btn { color: #ff4d4d; border-color: #ff4d4d; }
 		.red-btn:active { background: #ff4d4d; color: black; }
 
@@ -277,24 +277,45 @@
 		<div id="btn-lang-top" onclick="showLangModal()" title="Change Language"></div>
 	</div>
 
-	<div id="lang-modal" class="hidden">
-		<h2 style="font-family: 'Retro', monospace; text-align: center; margin-bottom: 40px; color: white;">Please select a language</h2>
-		<div style="display: flex; gap: 40px;">
-			<div onclick="selectLang('en')" style="cursor: pointer; text-align: center;">
-				<img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>EN</span>'">
-				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">English</div>
-			</div>
-			<div onclick="selectLang('jp')" style="cursor: pointer; text-align: center;">
-				<img src="https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>JP</span>'">
-				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">日本語</div>
-			</div>
-			<div onclick="selectLang('zh')" style="cursor: pointer; text-align: center;">
-				<img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>ZH</span>'">
-				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">中文</div>
-			</div>
-			<div onclick="selectLang('ko')" style="cursor: pointer; text-align: center;">
-				<img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>KO</span>'">
-				<div style="margin-top: 10px; font-size: 20px; color: white; font-family: 'Retro', monospace;">한국어</div>
+	<div id="lang-modal" class="hidden" onclick="closeLangModal(event)">
+		<div style="background: rgba(0,0,0,0.8); padding: 40px; border-radius: 10px; display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+			<h2 style="font-family: 'Retro', monospace; text-align: center; margin-bottom: 40px; color: white;">Please select a language</h2>
+			<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 800px;">
+				<!-- EN -->
+				<div onclick="selectLang('en')" style="cursor: pointer; text-align: center;">
+					<img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>EN</span>'">
+					<div style="margin-top: 10px; font-size: 16px; color: white; font-family: 'Retro', monospace;">English</div>
+				</div>
+				<!-- DE -->
+				<div onclick="selectLang('de')" style="cursor: pointer; text-align: center;">
+					<img src="https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>DE</span>'">
+					<div style="margin-top: 10px; font-size: 16px; color: white; font-family: 'Retro', monospace;">Deutsch</div>
+				</div>
+				<!-- FR -->
+				<div onclick="selectLang('fr')" style="cursor: pointer; text-align: center;">
+					<img src="https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>FR</span>'">
+					<div style="margin-top: 10px; font-size: 16px; color: white; font-family: 'Retro', monospace;">Français</div>
+				</div>
+				<!-- ES -->
+				<div onclick="selectLang('es')" style="cursor: pointer; text-align: center;">
+					<img src="https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>ES</span>'">
+					<div style="margin-top: 10px; font-size: 16px; color: white; font-family: 'Retro', monospace;">Español</div>
+				</div>
+				<!-- JP -->
+				<div onclick="selectLang('jp')" style="cursor: pointer; text-align: center;">
+					<img src="https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>JP</span>'">
+					<div style="margin-top: 10px; font-size: 16px; color: white; font-family: 'Retro', monospace;">日本語</div>
+				</div>
+				<!-- ZH -->
+				<div onclick="selectLang('zh')" style="cursor: pointer; text-align: center;">
+					<img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>ZH</span>'">
+					<div style="margin-top: 10px; font-size: 16px; color: white; font-family: 'Retro', monospace;">中文</div>
+				</div>
+				<!-- KO -->
+				<div onclick="selectLang('ko')" style="cursor: pointer; text-align: center;">
+					<img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg" class="lang-flag" onerror="this.outerHTML='<span class=\\'flag-fallback\\'>KO</span>'">
+					<div style="margin-top: 10px; font-size: 16px; color: white; font-family: 'Retro', monospace;">한국어</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -356,6 +377,60 @@
 				allComplete: "All Complete!", completeMsg: "Total time: {0} ms. Press Full Restart.",
 				promptRename: "Enter a new section name:"
 			},
+			de: {
+				setup: "SYSTEM-EINSTELLUNGEN", modeAll: "Alle", modeRand: "Zufällig", mute: "Stumm", unmute: "Ton an",
+				addSec: "+ Bereich", start: "TRAINING STARTEN", restart: "Vollständiger Neustart", hardReset: "Hard Reset",
+				cat: "Kategorie", total: "Gesamtzeit", ms: "ms", waiting: "Warten...",
+				wrong: "Falsch!", next: "Gut. Weiter.", good: "Sehr gut!", goodBut: "Gut, aber nicht dieser.",
+				promptNewSec: "Neuen Bereichsnamen eingeben:", promptLen: "Code-Länge (z.B. 4):",
+				errLen: "Ungültige Länge.", errTooLong: "Fehler! Der Code ist zu lang.",
+				promptCodeFirst: "Ersten Code eingeben ({0} Stellen):",
+				promptCodeNew: "Neuen Code eingeben ({0} Stellen):",
+				promptCodeEdit: "Code eingeben ({0} Stellen):",
+				errDigits: "Fehler! Nur Zahlen.", errDigitsLen: "Fehler! Genau {0} Stellen erforderlich.",
+				errActive: "Fehler! Mindestens ein Code muss aktiv sein.",
+				errLastCode: "Fehler! Der letzte Code kann nicht gelöscht werden.",
+				confirmDelSec: "Bereich '{0}' löschen?", confirmDelCode: "Diesen Code entfernen?",
+				errNeedSec: "Fehler! Mindestens ein Bereich erforderlich.",
+				allComplete: "Alles abgeschlossen!", completeMsg: "Gesamtzeit: {0} ms. Drücke Neustart.",
+				promptRename: "Neuen Namen eingeben:"
+			},
+			fr: {
+				setup: "CONFIGURATION", modeAll: "Tout", modeRand: "Aléatoire", mute: "Muet", unmute: "Son activé",
+				addSec: "+ Section", start: "LANCER L'ENTRAÎNEMENT", restart: "Redémarrage total", hardReset: "Réinitialisation",
+				cat: "Catégorie", total: "Temps total", ms: "ms", waiting: "En attente...",
+				wrong: "Faux !", next: "Bien. Suivant.", good: "Bravo !", goodBut: "Bon, mais pas celui-là.",
+				promptNewSec: "Nom de la nouvelle section :", promptLen: "Longueur du code (ex: 4) :",
+				errLen: "Longueur invalide.", errTooLong: "Erreur ! Le code est trop long.",
+				promptCodeFirst: "Entrez le PREMIER code (strictement {0} chiffres) :",
+				promptCodeNew: "Entrez le nouveau code (strictement {0} chiffres) :",
+				promptCodeEdit: "Entrez le code (strictement {0} chiffres) :",
+				errDigits: "Erreur ! Chiffres uniquement.", errDigitsLen: "Erreur ! {0} chiffres requis.",
+				errActive: "Erreur ! Au moins un code doit être activé.",
+				errLastCode: "Erreur ! Impossible de supprimer le dernier code.",
+				confirmDelSec: "Supprimer la section '{0}' ?", confirmDelCode: "Supprimer ce code ?",
+				errNeedSec: "Erreur ! Il faut au moins une section.",
+				allComplete: "Terminé !", completeMsg: "Temps total : {0} ms. Appuyez sur Redémarrer.",
+				promptRename: "Nouveau nom de section :"
+			},
+			es: {
+				setup: "CONFIGURACIÓN", modeAll: "Todo", modeRand: "Aleatorio", mute: "Silencio", unmute: "Activar sonido",
+				addSec: "+ Sección", start: "INICIAR ENTRENAMIENTO", restart: "Reiniciar todo", hardReset: "Restablecimiento",
+				cat: "Categoría", total: "Tiempo total", ms: "ms", waiting: "Esperando...",
+				wrong: "¡Incorrecto!", next: "Bien. Siguiente.", good: "¡Bien!", goodBut: "Bien, pero no es este.",
+				promptNewSec: "Nombre de la nueva sección:", promptLen: "Longitud del código (ej: 4):",
+				errLen: "Longitud no válida.", errTooLong: "¡Error! El código es demasiado largo.",
+				promptCodeFirst: "Ingrese el PRIMER código (estrictamente {0} dígitos):",
+				promptCodeNew: "Ingrese el nuevo código (estrictamente {0} dígitos):",
+				promptCodeEdit: "Ingrese el código (estrictamente {0} dígitos):",
+				errDigits: "¡Error! Solo números.", errDigitsLen: "¡Error! Se requieren {0} dígitos.",
+				errActive: "¡Error! Debe haber al least un código activo.",
+				errLastCode: "¡Error! No puedes borrar el último código.",
+				confirmDelSec: "¿Borrar sección '{0}'?", confirmDelCode: "¿Quitar este código?",
+				errNeedSec: "¡Error! Debe haber al menos una sección.",
+				allComplete: "¡Completado!", completeMsg: "Tiempo total: {0} ms. Pulsa Reiniciar.",
+				promptRename: "Nuevo nombre de la sección:"
+			},
 			jp: {
 				setup: "システム設定", modeAll: "すべて", modeRand: "ランダム", mute: "消音", unmute: "消音解除",
 				addSec: "+ セクション", start: "トレーニング開始", restart: "再起動", hardReset: "完全初期化",
@@ -412,15 +487,15 @@
 			}
 		};
 
-		let curLang = 'en'; 
+		let curLang = 'en';
 		const t = (key, ...args) => {
 			let str = (I18N[curLang] && I18N[curLang][key]) || (I18N['en'][key]) || key;
 			args.forEach((arg, i) => { str = str.replace(`{${i}}`, arg); });
 			return str;
 		};
-		
+
 		const $ = id => document.getElementById(id);
-		
+
 		const sndMove = new Audio('Audio/001-System01.ogg');
 		const sndConfirm = new Audio('Audio/002-System02.ogg');
 		const sndRestart = new Audio('Audio/003-System03.ogg');
@@ -536,9 +611,19 @@
 			}
 		};
 
+		window.closeLangModal = function(event) {
+			if (isInitMode) return;
+			if (event.target.id === 'lang-modal') {
+				$('lang-modal').classList.add('hidden');
+			}
+		};
+
 		function updateTopLeftFlag() {
 			const flagMap = {
 				en: "https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg",
+				de: "https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg",
+				fr: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
+				es: "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg",
 				jp: "https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg",
 				zh: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
 				ko: "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg"
@@ -575,7 +660,7 @@
 			if(hrTimeout) clearTimeout(hrTimeout);
 
 			const btn = $('btn-hard-reset');
-			
+
 			if(hrClicks >= 5) {
 				hrClicks = 0;
 				btn.innerText = t('hardReset');
@@ -583,8 +668,8 @@
 				performHardReset();
 			} else {
 				btn.innerText = `[ ${5 - hrClicks} ]`;
-				hrTimeout = setTimeout(() => { 
-					hrClicks = 0; 
+				hrTimeout = setTimeout(() => {
+					hrClicks = 0;
 					btn.innerText = t('hardReset');
 				}, 800);
 			}
@@ -596,7 +681,7 @@
 			categories = JSON.parse(JSON.stringify(defaultCategories));
 			populateHints(categories);
 			isInitMode = true;
-			
+
 			elConfigPanel.classList.add('hidden');
 			elGamePanel.classList.add('hidden');
 			showLangModal();
@@ -629,7 +714,7 @@
 			while (head < queue.length) {
 				const [pos, mask, path] = queue[head++];
 				if (mask === targetMask) return path + " Z";
-				
+
 				const moves =[ { char: "→", step: 1 }, { char: "←", step: -1 } ];
 				for (const move of moves) {
 					let newPos = (pos + move.step + n) % n;
@@ -850,7 +935,7 @@
 		}
 
 		window.startTraining = function() {
-			playSound(sndConfirm); 
+			playSound(sndConfirm);
 			blindMode = qHeld;
 			state = 'WAITING_Z';
 			currentCategoryIdx = 0;
@@ -1034,7 +1119,7 @@
 		});
 
 		btnRestart.addEventListener('click', () => {
-			playSound(sndRestart); 
+			playSound(sndRestart);
 			initConfig();
 		});
 
