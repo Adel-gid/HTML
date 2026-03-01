@@ -4,6 +4,7 @@
 <html lang="ru">
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<title>Ao Oni Password Trainer</title>
 	<style>
 		@font-face {
@@ -58,6 +59,8 @@
 
 		#lock-box {
 			width: 400px;
+			max-width: 95vw;
+			box-sizing: border-box;
 			height: 80px;
 			display: flex;
 			align-items: center;
@@ -110,6 +113,8 @@
 
 		#config-panel {
 			width: 450px;
+			max-width: 95vw;
+			box-sizing: border-box;
 			max-height: 80vh;
 			display: flex;
 			flex-direction: column;
@@ -221,6 +226,7 @@
 			font-weight: bold;
 			color: #333;
 			width: 400px;
+			max-width: 95vw;
 		}
 
 		.hint-text {
@@ -270,11 +276,31 @@
 			width: 40px; height: 25px; line-height: 21px;
 			font-size: 16px; font-weight: bold; cursor: pointer;
 		}
+
+		.top-right-controls { position: absolute; top: 20px; right: 20px; z-index: 50; }
+		.stats-btn { color: #FF9800; cursor: pointer; font-family: 'Retro', monospace; font-size: 18px; user-select: none; transition: 0.1s; }
+		.stats-btn:hover { color: #ffcc00; }
+		.mobile-toggle { font-size: 28px; cursor: pointer; user-select: none; margin-left: 15px; filter: grayscale(100%); transition: 0.1s; display: inline-block; }
+		.mobile-toggle:hover { opacity: 0.7; }
+		.stats-tooltip { position: absolute; background: rgba(0,0,0,0.9); border: 2px solid white; color: white; padding: 15px; z-index: 1000; font-family: 'Retro', monospace; pointer-events: none; width: 280px; box-sizing: border-box; box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
+		#stats-modal { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; }
+		.stats-box { background: black; border: 2px solid white; padding: 30px; min-width: 300px; max-width: 95vw; box-sizing: border-box; text-align: center; }
+		#dpad-container { position: fixed; bottom: 30px; left: 30px; width: 160px; height: 160px; z-index: 500; touch-action: none; display: flex; align-items: center; justify-content: center; user-select: none; }
+		.dpad-bg { position: absolute; width: 130px; height: 130px; background: rgba(80,80,80,0.4); border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); pointer-events: none; }
+		.dpad-btn { position: absolute; background: rgba(30,30,30,0.8); color: white; border: 2px solid #aaa; border-radius: 5px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; cursor: pointer; user-select: none; font-family: monospace; }
+		.dpad-btn:active { background: #666; }
+		.dpad-up { top: 0; left: 57.5px; } .dpad-down { bottom: 0; left: 57.5px; } .dpad-left { left: 0; top: 57.5px; } .dpad-right { right: 0; top: 57.5px; }
+		.dpad-z { left: 57.5px; top: 57.5px; border-radius: 50%; width: 45px; height: 45px; background: rgba(180,0,0,0.8); border-color: #f55; }
+		.dpad-h { right: -20px; top: -20px; border-radius: 50%; width: 40px; height: 40px; background: rgba(0,100,200,0.8); border-color: #5af; font-size: 16px; }
 	</style>
 </head>
 <body>
 	<div class="top-left-controls" id="top-left-controls">
-		<div id="btn-lang-top" onclick="showLangModal()" title="Change Language"></div>
+		<div id="btn-lang-top" onclick="showLangModal()" title="Change Language" style="display:inline-block; vertical-align:top;"></div>
+		<div id="btn-mobile-toggle" class="mobile-toggle" onclick="toggleJoystick()" title="Toggle Joystick">📱</div>
+	</div>
+	<div class="top-right-controls" id="top-right-controls">
+		<div id="btn-global-stats" class="stats-btn" onclick="onGlobalStatsClick()">Statistics</div>
 	</div>
 
 	<div id="lang-modal" class="hidden" onclick="closeLangModal(event)">
@@ -356,6 +382,26 @@
 	</div>
 
 	<button class="restart-btn" id="restart-btn">Full restart</button>
+
+	<div id="stats-tooltip" class="stats-tooltip hidden"></div>
+
+	<div id="stats-modal" class="hidden" onclick="closeStatsModal(event)">
+		<div class="stats-box" onclick="event.stopPropagation()">
+			<h2 id="stats-modal-title" style="margin-top:0; letter-spacing: 2px;"></h2>
+			<div id="stats-modal-content"></div>
+			<button class="retro-btn" style="margin-top:20px;" onclick="closeStatsModal()">Close</button>
+		</div>
+	</div>
+
+	<div id="dpad-container" class="hidden">
+		<div class="dpad-bg"></div>
+		<div class="dpad-btn dpad-up" onmousedown="simKey('ArrowUp')" ontouchstart="simKey('ArrowUp', event)">▲</div>
+		<div class="dpad-btn dpad-down" onmousedown="simKey('ArrowDown')" ontouchstart="simKey('ArrowDown', event)">▼</div>
+		<div class="dpad-btn dpad-left" onmousedown="simKey('ArrowLeft')" ontouchstart="simKey('ArrowLeft', event)">◀</div>
+		<div class="dpad-btn dpad-right" onmousedown="simKey('ArrowRight')" ontouchstart="simKey('ArrowRight', event)">▶</div>
+		<div class="dpad-btn dpad-z" onmousedown="simKey('KeyZ')" ontouchstart="simKey('KeyZ', event)">Z</div>
+		<div class="dpad-btn dpad-h" onmousedown="simKey('KeyH')" ontouchstart="simKey('KeyH', event)">H</div>
+	</div>
 
 	<script>
 		const I18N = {
@@ -487,6 +533,17 @@
 			}
 		};
 
+		const extendedTranslations = {
+			en: { stats: "STATISTICS", best: "Best", avg: "Avg", runs: "Runs", secStats: "Section Stats", globStats: "Global Stats" },
+			de: { stats: "STATISTIK", best: "Beste", avg: "Ø", runs: "Versuche", secStats: "Bereichsstatistik", globStats: "Globale Statistik" },
+			fr: { stats: "STATISTIQUES", best: "Meilleur", avg: "Moy", runs: "Essais", secStats: "Stats Section", globStats: "Stats Globales" },
+			es: { stats: "ESTADÍSTICAS", best: "Mejor", avg: "Prom", runs: "Intentos", secStats: "Est. de Sección", globStats: "Est. Globales" },
+			jp: { stats: "統計", best: "ベスト", avg: "平均", runs: "回数", secStats: "セクション統計", globStats: "グローバル統計" },
+			zh: { stats: "统计", best: "最佳", avg: "平均", runs: "次数", secStats: "部分统计", globStats: "全局统计" },
+			ko: { stats: "통계", best: "최고", avg: "평균", runs: "실행 횟수", secStats: "섹션 통계", globStats: "글로벌 통계" }
+		};
+		for(let l in extendedTranslations) { if(I18N[l]) Object.assign(I18N[l], extendedTranslations[l]); }
+		
 		let curLang = 'en';
 		const t = (key, ...args) => {
 			let str = (I18N[curLang] && I18N[curLang][key]) || (I18N['en'][key]) || key;
@@ -518,30 +575,20 @@
 		//		 DATA & STORAGE LOGIC
 		// ==========================================
 
+		function makeEmptyStats() { return { all: { runs: 0, totalMs: 0, best: null }, random: { runs: 0, totalMs: 0, best: null } }; }
+
 		const defaultCategories =[
-			{
-				name: "Piano", isCollapsed: false,
-				codes:[ { target: "6799", isActive: true }, { target: "9761", isActive: true }, { target: "6392", isActive: true }, { target: "1416", isActive: true }, { target: "5156", isActive: true } ]
-			},
-			{
-				name: "Closet", isCollapsed: false,
-				codes:[ { target: "5376", isActive: true } ]
-			},
-			{
-				name: "Safe", isCollapsed: false,
-				codes:[ { target: "290", isActive: true }, { target: "361", isActive: true }, { target: "528", isActive: true } ]
-			},
-			{
-				name: "Iron door", isCollapsed: false,
-				codes:[ { target: "1237", isActive: true } ]
-			},
-			{
-				name: "Another safe", isCollapsed: false,
-				codes:[ { target: "3045", isActive: true } ]
-			}
+			{ name: "Piano", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "6799", isActive: true }, { target: "9761", isActive: true }, { target: "6392", isActive: true }, { target: "1416", isActive: true }, { target: "5156", isActive: true } ] },
+			{ name: "Closet", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "5376", isActive: true } ] },
+			{ name: "Safe", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "290", isActive: true }, { target: "361", isActive: true }, { target: "528", isActive: true } ] },
+			{ name: "Iron door", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "1237", isActive: true } ] },
+			{ name: "Another safe", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "3045", isActive: true } ] }
 		];
 
 		let categories =[];
+		let globalStats = makeEmptyStats();
+		let runCategories =[];
+		let sectionRealStartTime = null;
 
 		function populateHints(cats) {
 			cats.forEach(cat => {
@@ -553,6 +600,7 @@
 			try {
 				localStorage.setItem('aoOniLang', curLang);
 				localStorage.setItem('aoOniCategories', JSON.stringify(categories));
+				localStorage.setItem('aoOniGlobalStats', JSON.stringify(globalStats));
 			} catch(e) { console.error("Save error", e); }
 		}
 
@@ -560,12 +608,19 @@
 			try {
 				const savedLang = localStorage.getItem('aoOniLang');
 				const savedCats = localStorage.getItem('aoOniCategories');
+				const savedGStats = localStorage.getItem('aoOniGlobalStats');
 				if (savedLang) curLang = savedLang;
+				
 				if (savedCats) {
 					categories = JSON.parse(savedCats);
+					categories.forEach(c => {
+						if (c.isActive === undefined) c.isActive = true;
+						if (!c.stats) c.stats = makeEmptyStats();
+					});
 				} else {
 					categories = JSON.parse(JSON.stringify(defaultCategories));
 				}
+				if (savedGStats) globalStats = JSON.parse(savedGStats);
 				populateHints(categories);
 			} catch(e) {
 				categories = JSON.parse(JSON.stringify(defaultCategories));
@@ -641,12 +696,13 @@
 			$('btn-start').innerText = t('start');
 			$('restart-btn').innerText = t('restart');
 			$('btn-hard-reset').innerText = t('hardReset');
+			$('btn-global-stats').innerText = t('stats');
 
 			if (state === 'FINISHED') {
 				elCategory.innerText = t('allComplete');
 			} else if (state === 'WAITING_Z') {
-				if (categories[currentCategoryIdx]) {
-					elCategory.innerText = `${t('cat')}: ${categories[currentCategoryIdx].name}`;
+				if (runCategories[currentCategoryIdx]) {
+					elCategory.innerText = `${t('cat')}: ${runCategories[currentCategoryIdx].name}`;
 				}
 			}
 		}
@@ -678,7 +734,9 @@
 		function performHardReset() {
 			localStorage.removeItem('aoOniLang');
 			localStorage.removeItem('aoOniCategories');
+			localStorage.removeItem('aoOniGlobalStats');
 			categories = JSON.parse(JSON.stringify(defaultCategories));
+			globalStats = makeEmptyStats();
 			populateHints(categories);
 			isInitMode = true;
 
@@ -792,15 +850,19 @@
 			elConfigContainer.innerHTML = '';
 			categories.forEach((cat, cIdx) => {
 				let collapseIcon = cat.isCollapsed ? '[*]' : '[+]';
+				let secBulbClass = cat.isActive ? 'yellow' : 'gray';
+				let titleStyle = cat.isActive ? '' : 'color: #666; text-decoration: line-through;';
 				let secHtml = `
 					<div class="config-section">
 						<div class="sec-header">
 							<div>
 								<span class="collapse-icon" onclick="toggleCollapse(${cIdx})" title="Collapse/Expand">${collapseIcon}</span>
-								<span>${cat.name}</span>
+								<span style="${titleStyle}">${cat.name}</span>
 							</div>
 							<div>
+								<span class="icon-btn gray" id="sec-stats-btn-${cIdx}" onclick="onSectionStatsClick(${cIdx})" onmouseenter="showSectionStats(${cIdx}, event)" onmouseleave="hideStatsTooltip()" title="Stats">📄</span>
 								<span class="icon-btn blue" onclick="askEditSection(${cIdx})" title="Rename section">✎</span>
+								<span class="icon-btn ${secBulbClass}" onclick="toggleCategoryActive(${cIdx})" title="Toggle Section">💡</span>
 								<span class="icon-btn blue" onclick="askAddCode(${cIdx})" title="Add code to section">➕</span>
 								<span class="icon-btn red" onclick="askDeleteSection(${cIdx})" title="Delete section">✖</span>
 							</div>
@@ -827,6 +889,132 @@
 				elConfigContainer.innerHTML += secHtml;
 			});
 		}
+		
+		window.toggleCategoryActive = function(cIdx) {
+			playSound(sndMove);
+			categories[cIdx].isActive = !categories[cIdx].isActive;
+			saveData();
+			renderConfig();
+		};
+
+		function formatTime(ms) {
+			if (ms === null) return '-';
+			return ms >= 1000 ? (ms / 1000).toFixed(2) + 's' : ms + 'ms';
+		}
+
+		function buildStatsHtml(stats, title) {
+			let rAll = stats.all.runs, rRand = stats.random.runs;
+			let avgAll = rAll ? Math.round(stats.all.totalMs / rAll) : null;
+			let avgRand = rRand ? Math.round(stats.random.totalMs / rRand) : null;
+			return `
+				<div style="font-weight:bold; margin-bottom:10px; text-align:center; border-bottom:1px solid white; padding-bottom:5px;">${title}</div>
+				<div style="display:flex; justify-content:space-between; gap:30px; font-size:14px; text-align:left;">
+					<div>
+						<div style="color:#4CAF50; margin-bottom:5px; font-weight:bold;">[ALL]</div>
+						<div>${t('runs')}: ${rAll}</div>
+						<div>${t('best')}: ${formatTime(stats.all.best)}</div>
+						<div>${t('avg')}: ${formatTime(avgAll)}</div>
+					</div>
+					<div>
+						<div style="color:#FF9800; margin-bottom:5px; font-weight:bold;">[RAND]</div>
+						<div>${t('runs')}: ${rRand}</div>
+						<div>${t('best')}: ${formatTime(stats.random.best)}</div>
+						<div>${t('avg')}: ${formatTime(avgRand)}</div>
+					</div>
+				</div>
+			`;
+		}
+
+		window.showSectionStats = function(cIdx, e) {
+			let stats = categories[cIdx].stats;
+			let tt = $('stats-tooltip');
+			tt.innerHTML = buildStatsHtml(stats, categories[cIdx].name);
+			tt.style.left = (e.pageX - 150) + 'px';
+			tt.style.top = (e.pageY + 25) + 'px';
+			tt.classList.remove('hidden');
+		};
+
+		window.hideStatsTooltip = function() {
+			$('stats-tooltip').classList.add('hidden');
+		};
+
+		window.openStatsModal = function(type, cIdx) {
+			playSound(sndConfirm);
+			let title, stats;
+			if(type === 'GLOBAL') {
+				title = t('globStats');
+				stats = globalStats;
+			} else {
+				title = categories[cIdx].name + ' - ' + t('secStats');
+				stats = categories[cIdx].stats;
+			}
+			$('stats-modal-title').innerText = title;
+			$('stats-modal-content').innerHTML = buildStatsHtml(stats, type === 'GLOBAL' ? 'Global' : 'Section').replace(/<div style="font-weight:bold.*?<\/div>/,'');
+			$('stats-modal').classList.remove('hidden');
+		};
+
+		window.closeStatsModal = function(e) {
+			if(e && e.target.id !== 'stats-modal') return;
+			playSound(sndMove);
+			$('stats-modal').classList.add('hidden');
+		};
+
+		let globalStatsClicks = 0, globalStatsTo = null;
+		window.onGlobalStatsClick = function() {
+			globalStatsClicks++;
+			if(globalStatsTo) clearTimeout(globalStatsTo);
+			const btn = $('btn-global-stats');
+
+			if(globalStatsClicks >= 5) {
+				globalStatsClicks = 0;
+				btn.innerText = t('stats');
+				globalStats = makeEmptyStats();
+				saveData();
+				playSound(sndRestart);
+			} else if(globalStatsClicks > 1) {
+				btn.innerText = `[ ${5 - globalStatsClicks} ]`;
+				globalStatsTo = setTimeout(() => {
+					globalStatsClicks = 0;
+					btn.innerText = t('stats');
+					openStatsModal('GLOBAL');
+				}, 500);
+			} else {
+				globalStatsTo = setTimeout(() => {
+					globalStatsClicks = 0;
+					btn.innerText = t('stats');
+					openStatsModal('GLOBAL');
+				}, 500);
+			}
+		};
+
+		let secStatsClicks = {}, secStatsTo = {};
+		window.onSectionStatsClick = function(cIdx) {
+			secStatsClicks[cIdx] = (secStatsClicks[cIdx] || 0) + 1;
+			if(secStatsTo[cIdx]) clearTimeout(secStatsTo[cIdx]);
+			const btn = $('sec-stats-btn-' + cIdx);
+
+			if(secStatsClicks[cIdx] >= 5) {
+				secStatsClicks[cIdx] = 0;
+				btn.innerText = '📄';
+				categories[cIdx].stats = makeEmptyStats();
+				saveData();
+				playSound(sndRestart);
+				hideStatsTooltip();
+			} else if(secStatsClicks[cIdx] > 1) {
+				btn.innerText = `[${5 - secStatsClicks[cIdx]}]`;
+				secStatsTo[cIdx] = setTimeout(() => {
+					secStatsClicks[cIdx] = 0;
+					btn.innerText = '📄';
+					openStatsModal('SECTION', cIdx);
+				}, 500);
+			} else {
+				secStatsTo[cIdx] = setTimeout(() => {
+					secStatsClicks[cIdx] = 0;
+					btn.innerText = '📄';
+					openStatsModal('SECTION', cIdx);
+				}, 500);
+			}
+		};
 
 		window.askEditSection = function(cIdx) {
 			playSound(sndMove);
@@ -935,6 +1123,9 @@
 		}
 
 		window.startTraining = function() {
+			runCategories = categories.filter(c => c.isActive && c.codes.filter(co => co.isActive).length > 0);
+			if (runCategories.length === 0) return showError(t('errActive'));
+			
 			playSound(sndConfirm);
 			blindMode = qHeld;
 			state = 'WAITING_Z';
@@ -949,10 +1140,17 @@
 		};
 
 		function setupCategory() {
-			if (currentCategoryIdx >= categories.length) {
+			if (currentCategoryIdx >= runCategories.length) {
 				state = 'FINISHED';
 				elZPrompt.classList.add('hidden');
 				const totalTime = Date.now() - totalStartTime;
+
+				let cMode = gameMode.toLowerCase();
+				globalStats[cMode].runs++;
+				globalStats[cMode].totalMs += totalTime;
+				if(globalStats[cMode].best === null || totalTime < globalStats[cMode].best) globalStats[cMode].best = totalTime;
+				saveData();
+
 				elCategory.innerText = t('allComplete');
 				elMessage.innerText = t('completeMsg', totalTime);
 				elDigits.innerHTML = "";
@@ -962,7 +1160,8 @@
 
 			state = 'WAITING_Z';
 			enteredCodes =[];
-			const category = categories[currentCategoryIdx];
+			sectionRealStartTime = null;
+			const category = runCategories[currentCategoryIdx];
 
 			const reqLen = category.codes[0].target.length;
 			const requiredWidth = Math.max(400, (reqLen * 26) + 120);
@@ -983,7 +1182,7 @@
 		}
 
 		function resetDigits() {
-			const reqLen = categories[currentCategoryIdx].codes[0].target.length;
+			const reqLen = runCategories[currentCategoryIdx].codes[0].target.length;
 			digits = Array(reqLen).fill(0);
 			cursorPos = 0;
 		}
@@ -992,6 +1191,7 @@
 			state = 'INPUTTING';
 			elZPrompt.classList.add('hidden');
 			startTime = Date.now();
+			if (!sectionRealStartTime) sectionRealStartTime = startTime;
 			render();
 		}
 
@@ -1018,7 +1218,7 @@
 			}
 
 			if (showHint) {
-				const category = categories[currentCategoryIdx];
+				const category = runCategories[currentCategoryIdx];
 				const activeCodes = category.codes.filter(c => c.isActive);
 				const unenteredCodes = activeCodes.filter(c => !enteredCodes.includes(c.target));
 
@@ -1036,11 +1236,26 @@
 
 		function checkConfirm() {
 			const currentInput = digits.join('');
-			const category = categories[currentCategoryIdx];
+			const category = runCategories[currentCategoryIdx];
 			const activeCodes = category.codes.filter(c => c.isActive);
 			const matchedCode = activeCodes.find(c => c.target === currentInput);
 
 			playSound(sndConfirm);
+
+			const finishSection = () => {
+				const timeTaken = Date.now() - startTime;
+				elMessage.innerText = `${t('good')} ${timeTaken} ${t('ms')}`;
+				
+				let sectionTime = Date.now() - sectionRealStartTime;
+				let cMode = gameMode.toLowerCase();
+				category.stats[cMode].runs++;
+				category.stats[cMode].totalMs += sectionTime;
+				if(category.stats[cMode].best === null || sectionTime < category.stats[cMode].best) category.stats[cMode].best = sectionTime;
+				saveData();
+
+				currentCategoryIdx++;
+				setupCategory();
+			};
 
 			if (matchedCode && !enteredCodes.includes(currentInput)) {
 				enteredCodes.push(currentInput);
@@ -1048,10 +1263,7 @@
 
 				if (gameMode === 'RANDOM') {
 					if (currentInput === category.randomTarget) {
-						const timeTaken = Date.now() - startTime;
-						elMessage.innerText = `${t('good')} ${timeTaken} ${t('ms')}`;
-						currentCategoryIdx++;
-						setupCategory();
+						finishSection();
 					} else {
 						elMessage.innerText = t('goodBut');
 						resetDigits();
@@ -1063,10 +1275,7 @@
 						resetDigits();
 						render();
 					} else {
-						const timeTaken = Date.now() - startTime;
-						elMessage.innerText = `${t('good')} ${timeTaken} ${t('ms')}`;
-						currentCategoryIdx++;
-						setupCategory();
+						finishSection();
 					}
 				}
 			} else {
@@ -1121,6 +1330,49 @@
 		btnRestart.addEventListener('click', () => {
 			playSound(sndRestart);
 			initConfig();
+		});
+		
+		window.simKey = function(code, e) {
+			if(e) { e.preventDefault(); e.stopPropagation(); }
+			const keyMap = { 'ArrowUp': 'ArrowUp', 'ArrowDown': 'ArrowDown', 'ArrowLeft': 'ArrowLeft', 'ArrowRight': 'ArrowRight', 'KeyZ': 'z', 'KeyH': 'h' };
+			const evDown = new KeyboardEvent('keydown', { code: code, key: keyMap[code] });
+			window.dispatchEvent(evDown);
+		};
+
+		let isDraggingPad = false, padOffsetX = 0, padOffsetY = 0;
+		const pad = $('dpad-container');
+
+		pad.addEventListener('touchstart', (e) => {
+			if(e.target.classList.contains('dpad-btn')) return;
+			isDraggingPad = true;
+			let touch = e.touches[0];
+			let rect = pad.getBoundingClientRect();
+			padOffsetX = touch.clientX - rect.left;
+			padOffsetY = touch.clientY - rect.top;
+		}, {passive: false});
+
+		document.addEventListener('touchmove', (e) => {
+			if(!isDraggingPad) return;
+			e.preventDefault();
+			let touch = e.touches[0];
+			pad.style.left = (touch.clientX - padOffsetX) + 'px';
+			pad.style.top = (touch.clientY - padOffsetY) + 'px';
+			pad.style.bottom = 'auto';
+			pad.style.right = 'auto';
+		}, {passive: false});
+
+		document.addEventListener('touchend', () => { isDraggingPad = false; });
+
+		window.toggleJoystick = function() {
+			pad.classList.toggle('hidden');
+		};
+
+		if (/Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+			pad.classList.remove('hidden');
+		}
+
+		$('z-prompt').addEventListener('click', () => {
+			if (state === 'WAITING_Z') window.simKey('KeyZ');
 		});
 
 		initApp();
