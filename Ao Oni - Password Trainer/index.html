@@ -7,284 +7,87 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<title>Ao Oni Password Trainer</title>
 	<style>
-		@font-face {
-			font-family: 'Retro';
-			src: local('Courier New'), monospace;
-		}
-
+		@font-face { font-family: 'Retro'; src: local('Courier New'), monospace; }
 		body {
-			background-color: #fdf5e6;
-			margin: 0;
-			padding: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			height: 100vh;
-			font-family: 'Retro', monospace;
-			user-select: none;
+			background-color: #fdf5e6; margin: 0; padding: 0; display: flex;
+			flex-direction: column; align-items: center; justify-content: center;
+			height: 100vh; font-family: 'Retro', monospace; user-select: none;
 			overflow: hidden;
 		}
-
-		.top-left-controls {
-			position: absolute;
-			top: 20px;
-			left: 20px;
-			z-index: 50;
+		.top-left-controls { position: absolute; top: 20px; left: 20px; z-index: 70; display: flex; align-items: center; }
+		.global-stats-container {
+			position: absolute; top: 20px; right: 20px; z-index: 50; color: white;
+			background-color: black; border: 2px solid white; border-radius: 3px;
+			padding: 12px 20px; box-shadow: 0 0 0 4px black; text-align: center;
+			min-width: 250px; box-sizing: border-box; transition: z-index 0s;
 		}
-
-		.app-wrapper {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: center;
-			gap: 40px;
-			width: 100%;
-		}
-
-		.lock-container {
-			background-color: black;
-			border: 2px solid white;
-			border-radius: 3px;
-			padding: 25px 40px;
-			box-shadow: 0 0 0 4px black;
-			position: relative;
-		}
-
-		.game-panel {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
-
-		#lock-box {
-			width: 400px;
-			max-width: 95vw;
-			box-sizing: border-box;
-			height: 80px;
-			display: flex;
-			align-items: center;
-			justify-content: flex-start;
-			transition: width 0.3s ease;
-		}
-
-		.digits-display {
-			display: flex;
-			align-items: center;
-			gap: 4px;
-			margin-left: 10px;
-		}
-
-		.digit-block {
-			display: flex;
-			align-items: center;
-		}
-
-		.cursor {
-			color: white;
-			font-size: 20px;
-			width: 14px;
-			text-align: right;
-			margin-right: 2px;
-		}
-
+		.stats-word { cursor: pointer; color: #FF9800; transition: 0.1s; }
+		.stats-word:hover { opacity: 0.8; }
+		.app-wrapper { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 40px; width: 100%; }
+		.lock-container { background-color: black; border: 2px solid white; border-radius: 3px; padding: 25px 40px; box-shadow: 0 0 0 4px black; position: relative; }
+		.game-panel { display: flex; flex-direction: column; align-items: center; }
+		#lock-box { width: 400px; max-width: 95vw; box-sizing: border-box; height: 80px; display: flex; align-items: center; justify-content: flex-start; transition: width 0.3s ease; }
+		.digits-display { display: flex; align-items: center; gap: 4px; margin-left: 10px; }
+		.digit-block { display: flex; align-items: center; }
+		.cursor { color: white; font-size: 20px; width: 14px; text-align: right; margin-right: 2px; }
 		.cursor.hidden-cursor { visibility: hidden; }
-
-		.digit {
-			color: white;
-			font-size: 28px;
-			width: 20px;
-			text-align: center;
-			font-family: 'Retro', monospace;
-		}
-
-		.z-prompt {
-			position: absolute;
-			top: 0; left: 0; right: 0; bottom: 0;
-			background-color: black;
-			color: white;
-			font-size: 64px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			z-index: 10;
-			border-radius: 3px;
-		}
-
-		#config-panel {
-			width: 450px;
-			max-width: 95vw;
-			box-sizing: border-box;
-			max-height: 80vh;
-			display: flex;
-			flex-direction: column;
-			color: white;
-			font-size: 16px;
-		}
-
-		.config-header {
-			text-align: center;
-			font-size: 24px;
-			margin-bottom: 15px;
-			letter-spacing: 2px;
-		}
-
-		.config-sections-container {
-			flex-grow: 1;
-			overflow-y: auto;
-			margin-bottom: 20px;
-			padding-right: 10px;
-		}
-
+		.digit { color: white; font-size: 28px; width: 20px; text-align: center; font-family: 'Retro', monospace; }
+		.z-prompt { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; font-size: 64px; display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 3px; }
+		#config-panel { width: 450px; max-width: 95vw; box-sizing: border-box; max-height: 80vh; display: flex; flex-direction: column; color: white; font-size: 16px; z-index: 60; }
+		.config-header { text-align: center; font-size: 24px; margin-bottom: 15px; letter-spacing: 2px; }
+		.config-sections-container { flex-grow: 1; overflow-y: auto; margin-bottom: 20px; padding-right: 10px; }
 		.config-sections-container::-webkit-scrollbar { width: 8px; }
 		.config-sections-container::-webkit-scrollbar-track { background: #111; }
 		.config-sections-container::-webkit-scrollbar-thumb { background: #fff; border-radius: 4px; }
-
-		.config-section {
-			margin-bottom: 15px;
-			border-bottom: 1px dashed #444;
-			padding-bottom: 10px;
-		}
-
-		.sec-header {
-			display: flex;
-			justify-content: space-between;
-			color: #ccc;
-			margin-bottom: 8px;
-			font-weight: bold;
-		}
-
-		.collapse-icon {
-			cursor: pointer;
-			color: white;
-			margin-right: 5px;
-		}
+		.config-section { margin-bottom: 15px; border-bottom: 1px dashed #444; padding-bottom: 10px; }
+		.sec-header { display: flex; justify-content: space-between; align-items: center; color: #ccc; margin-bottom: 8px; font-weight: bold; flex-wrap: nowrap; white-space: nowrap; }
+		.sec-header > div:first-child { display: flex; align-items: center; overflow: hidden; text-overflow: ellipsis; }
+		.sec-header > div:last-child { display: flex; flex-shrink: 0; align-items: center; }
+		.collapse-icon { cursor: pointer; color: white; margin-right: 5px; }
 		.collapse-icon:hover { color: #aaa; }
-
-		.code-row {
-			display: flex;
-			justify-content: space-between;
-			padding-left: 20px;
-			margin-bottom: 4px;
-		}
-
-		.icon-btn {
-			cursor: pointer;
-			margin-left: 8px;
-			user-select: none;
-			font-size: 18px;
-		}
-
+		.code-row { display: flex; justify-content: space-between; align-items: center; padding-left: 20px; margin-bottom: 4px; flex-wrap: nowrap; white-space: nowrap; }
+		.code-row > span { overflow: hidden; text-overflow: ellipsis; }
+		.code-row > div { display: flex; flex-shrink: 0; align-items: center; }
+		.icon-btn { cursor: pointer; margin-left: 8px; user-select: none; font-size: 18px; }
 		.icon-btn:hover { opacity: 0.7; }
 		.icon-btn.blue { color: #4da6ff; }
 		.icon-btn.red { color: #ff4d4d; }
 		.icon-btn.yellow { color: #ffcc00; }
 		.icon-btn.gray { color: #555; filter: grayscale(100%); }
-
-		.config-footer {
-			text-align: center;
-			border-top: 2px solid white;
-			padding-top: 15px;
-		}
-
+		.config-footer { text-align: center; border-top: 2px solid white; padding-top: 15px; }
 		.btn-row { margin-bottom: 10px; display: flex; justify-content: center; gap: 15px; }
-
-		.retro-btn {
-			font-family: 'Retro', monospace;
-			padding: 8px 15px;
-			cursor: pointer;
-			border: 2px solid white;
-			background: black;
-			color: white;
-			font-size: 16px;
-			font-weight: bold;
-			transition: all 0.1s ease;
-		}
+		.retro-btn { font-family: 'Retro', monospace; padding: 8px 15px; cursor: pointer; border: 2px solid white; background: black; color: white; font-size: 16px; font-weight: bold; transition: all 0.1s ease; }
 		.retro-btn:hover { opacity: 0.8; }
 		.retro-btn:active { background: #333; }
-
 		.mode-all { color: #4CAF50; border-color: #4CAF50; }
 		.mode-all.selected { background: #4CAF50; color: black; }
 		.mode-random { color: #FF9800; border-color: #FF9800; }
 		.mode-random.selected { background: #FF9800; color: black; }
-
 		.btn-mute { color: #ccc; border-color: #ccc; }
 		.btn-mute.muted { background: #ccc; color: black; }
-
 		.start-btn { color: #fff; border-color: #fff; background: #222; }
-
 		.red-btn { color: #ff4d4d; border-color: #ff4d4d; }
 		.red-btn:active { background: #ff4d4d; color: black; }
-
 		.hidden { display: none !important; }
-
-		.ui-panel {
-			margin-bottom: 20px;
-			text-align: center;
-			height: 100px;
-			font-size: 20px;
-			font-weight: bold;
-			color: #333;
-			width: 400px;
-			max-width: 95vw;
-		}
-
-		.hint-text {
-			color: #d32f2f;
-			margin-top: 10px;
-			font-size: 22px;
-			min-height: 30px;
-		}
-
-		.restart-btn {
-			position: absolute;
-			bottom: 20px;
-			right: 20px;
-			padding: 10px 20px;
-			background-color: #333;
-			color: white;
-			border: 2px solid #111;
-			cursor: pointer;
-			font-family: 'Retro', monospace;
-			font-size: 16px;
-		}
+		.ui-panel { margin-bottom: 20px; text-align: center; height: 100px; font-size: 20px; font-weight: bold; color: #333; width: 400px; max-width: 95vw; }
+		.hint-text { color: #d32f2f; margin-top: 10px; font-size: 22px; min-height: 30px; }
+		.restart-btn { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background-color: #333; color: white; border: 2px solid #111; cursor: pointer; font-family: 'Retro', monospace; font-size: 16px; overflow: hidden; z-index: 100; }
 		.restart-btn:hover { background-color: #555; }
 		.restart-btn:active { background-color: #000; }
-
-		#lang-modal {
-			position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-			background-color: rgba(0, 0, 0, 0.95);
-			display: flex; flex-direction: column; align-items: center; justify-content: center;
-			z-index: 1000;
-		}
-
+		.restart-btn.blind-active { border-color: #4CAF50; color: #4CAF50; }
+		.restart-fill { position: absolute; top: 0; bottom: 0; left: 0; width: 0%; background: linear-gradient(90deg, rgba(255,0,0,0.5) 0%, rgba(0,255,0,0.5) 100%); pointer-events: none; z-index: 0; }
+		.restart-text { position: relative; z-index: 1; }
+		.stats-box, #creator-modal > div { background-color: black; border: 2px solid white; border-radius: 3px; box-shadow: 0 0 0 4px black; padding: 30px; max-width: 95vw; box-sizing: border-box; }
+		#lang-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
 		.lang-flag { width: 80px; height: 50px; border: 2px solid white; object-fit: cover; }
 		.lang-flag-small { width: 40px; height: 25px; border: 2px solid white; object-fit: cover; cursor: pointer; }
-
-		.flag-fallback, .flag-fallback-small {
-			display: inline-block;
-			background: black; color: black;
-			-webkit-text-stroke: 1px white;
-			font-family: 'Retro', monospace;
-			border: 2px solid white; text-align: center; box-sizing: border-box;
-		}
-		.flag-fallback {
-			width: 80px; height: 50px; line-height: 46px;
-			font-size: 32px; font-weight: bold;
-		}
-		.flag-fallback-small {
-			width: 40px; height: 25px; line-height: 21px;
-			font-size: 16px; font-weight: bold; cursor: pointer;
-		}
-
-		.top-right-controls { position: absolute; top: 20px; right: 20px; z-index: 50; }
-		.stats-btn { color: #FF9800; cursor: pointer; font-family: 'Retro', monospace; font-size: 18px; user-select: none; transition: 0.1s; }
-		.stats-btn:hover { color: #ffcc00; }
-		.mobile-toggle { font-size: 28px; cursor: pointer; user-select: none; margin-left: 15px; filter: grayscale(100%); transition: 0.1s; display: inline-block; }
+		.flag-fallback, .flag-fallback-small { display: inline-block; background: black; color: black; -webkit-text-stroke: 1px white; font-family: 'Retro', monospace; border: 2px solid white; text-align: center; box-sizing: border-box; }
+		.flag-fallback { width: 80px; height: 50px; line-height: 46px; font-size: 32px; font-weight: bold; }
+		.flag-fallback-small { width: 40px; height: 25px; line-height: 21px; font-size: 16px; font-weight: bold; cursor: pointer; }
+		.mobile-toggle { font-size: 28px; cursor: pointer; user-select: none; margin-left: 15px; filter: grayscale(100%); transition: 0.1s; transform: translateY(-3px); }
 		.mobile-toggle:hover { opacity: 0.7; }
 		.stats-tooltip { position: absolute; background: rgba(0,0,0,0.9); border: 2px solid white; color: white; padding: 15px; z-index: 1000; font-family: 'Retro', monospace; pointer-events: none; width: 280px; box-sizing: border-box; box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
 		#stats-modal { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; }
-		.stats-box { background: black; border: 2px solid white; padding: 30px; min-width: 300px; max-width: 95vw; box-sizing: border-box; text-align: center; }
 		#dpad-container { position: fixed; bottom: 30px; left: 30px; width: 160px; height: 160px; z-index: 500; touch-action: none; display: flex; align-items: center; justify-content: center; user-select: none; }
 		.dpad-bg { position: absolute; width: 130px; height: 130px; background: rgba(80,80,80,0.4); border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); pointer-events: none; }
 		.dpad-btn { position: absolute; background: rgba(30,30,30,0.8); color: white; border: 2px solid #aaa; border-radius: 5px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; cursor: pointer; user-select: none; font-family: monospace; }
@@ -292,15 +95,23 @@
 		.dpad-up { top: 0; left: 57.5px; } .dpad-down { bottom: 0; left: 57.5px; } .dpad-left { left: 0; top: 57.5px; } .dpad-right { right: 0; top: 57.5px; }
 		.dpad-z { left: 57.5px; top: 57.5px; border-radius: 50%; width: 45px; height: 45px; background: rgba(180,0,0,0.8); border-color: #f55; }
 		.dpad-h { right: -20px; top: -20px; border-radius: 50%; width: 40px; height: 40px; background: rgba(0,100,200,0.8); border-color: #5af; font-size: 16px; }
+
+		.global-stats-container {
+			position: absolute; top: 20px; right: 20px; z-index: 50; color: white;
+			background-color: black; border: 2px solid white; border-radius: 3px;
+			padding: 12px 20px; box-shadow: 0 0 0 4px black; text-align: center;
+			min-width: 250px; box-sizing: border-box;
+		}
+		.stats-word {
+			display: inline-block; min-width: 120px; text-align: center;
+			cursor: pointer; color: #FF9800; transition: 0.1s;
+		}
 	</style>
 </head>
 <body>
 	<div class="top-left-controls" id="top-left-controls">
 		<div id="btn-lang-top" onclick="showLangModal()" title="Change Language" style="display:inline-block; vertical-align:top;"></div>
 		<div id="btn-mobile-toggle" class="mobile-toggle" onclick="toggleJoystick()" title="Toggle Joystick">📱</div>
-	</div>
-	<div class="top-right-controls" id="top-right-controls">
-		<div id="btn-global-stats" class="stats-btn" onclick="onGlobalStatsClick()">Statistics</div>
 	</div>
 
 	<div id="lang-modal" class="hidden" onclick="closeLangModal(event)">
@@ -346,6 +157,13 @@
 		</div>
 	</div>
 
+	<div id="global-stats-container" class="global-stats-container">
+		<div style="font-size: 16px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+			Global <span id="btn-global-stats" class="stats-word" onclick="onGlobalStatsClick()">statistics</span>
+		</div>
+		<div id="global-stats-content"></div>
+	</div>
+
 	<div class="app-wrapper">
 		<div id="config-panel" class="lock-container hidden">
 			<div class="config-header" id="config-header-text">SYSTEM SETUP</div>
@@ -381,7 +199,10 @@
 		</div>
 	</div>
 
-	<button class="restart-btn" id="restart-btn">Full restart</button>
+	<button class="restart-btn" id="restart-btn">
+		<div class="restart-fill" id="restart-fill"></div>
+		<span class="restart-text" id="restart-btn-text">Full restart</span>
+	</button>
 
 	<div id="stats-tooltip" class="stats-tooltip hidden"></div>
 
@@ -390,6 +211,13 @@
 			<h2 id="stats-modal-title" style="margin-top:0; letter-spacing: 2px;"></h2>
 			<div id="stats-modal-content"></div>
 			<button class="retro-btn" style="margin-top:20px;" onclick="closeStatsModal()">Close</button>
+		</div>
+	</div>
+
+	<div id="creator-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:3000;color:white;" onclick="this.classList.add('hidden')">
+		<div onclick="event.stopPropagation()" style="text-align:center;">
+			<div id="creator-text" style="font-size:18px; line-height:1.5; white-space:pre-wrap;"></div>
+			<button class="retro-btn" style="margin-top:25px;" onclick="$('creator-modal').classList.add('hidden')">Close</button>
 		</div>
 	</div>
 
@@ -421,7 +249,9 @@
 				confirmDelSec: "Delete section '{0}'?", confirmDelCode: "Remove this code?",
 				errNeedSec: "Error! There must be at least one section.",
 				allComplete: "All Complete!", completeMsg: "Total time: {0} ms. Press Full Restart.",
-				promptRename: "Enter a new section name:"
+				promptRename: "Enter a new section name:",
+				stats: "STATISTICS", best: "Best", avg: "Avg", runs: "Runs", secStats: "Section Stats", globStats: "Global statistics",
+				creatorMsg: "Written by Adel'gid Aragami. Respect to Ao Oni and the entire RPGMaker community as a whole ❤\n\nP.S.: The original RGSS1 is slow because the technologies were outdated. Can I do better?"
 			},
 			de: {
 				setup: "SYSTEM-EINSTELLUNGEN", modeAll: "Alle", modeRand: "Zufällig", mute: "Stumm", unmute: "Ton an",
@@ -439,7 +269,9 @@
 				confirmDelSec: "Bereich '{0}' löschen?", confirmDelCode: "Diesen Code entfernen?",
 				errNeedSec: "Fehler! Mindestens ein Bereich erforderlich.",
 				allComplete: "Alles abgeschlossen!", completeMsg: "Gesamtzeit: {0} ms. Drücke Neustart.",
-				promptRename: "Neuen Namen eingeben:"
+				promptRename: "Neuen Namen eingeben:",
+				stats: "STATISTIK", best: "Beste", avg: "Ø", runs: "Versuche", secStats: "Bereichsstatistik", globStats: "Globale statistics",
+				creatorMsg: "Geschrieben von Adel'gid Aragami. Mit Respekt für Ao Oni und die gesamte RPGMaker-Community ❤\n\nP.S.: Das originale RGSS1 ist langsam, weil die Technologien veraltet waren. Kann ich es besser machen?"
 			},
 			fr: {
 				setup: "CONFIGURATION", modeAll: "Tout", modeRand: "Aléatoire", mute: "Muet", unmute: "Son activé",
@@ -457,7 +289,9 @@
 				confirmDelSec: "Supprimer la section '{0}' ?", confirmDelCode: "Supprimer ce code ?",
 				errNeedSec: "Erreur ! Il faut au moins une section.",
 				allComplete: "Terminé !", completeMsg: "Temps total : {0} ms. Appuyez sur Redémarrer.",
-				promptRename: "Nouveau nom de section :"
+				promptRename: "Nouveau nom de section :",
+				stats: "STATISTIQUES", best: "Meilleur", avg: "Moy", runs: "Essais", secStats: "Stats Section", globStats: "Global statistics",
+				creatorMsg: "Écrit par Adel'gid Aragami. Avec respect pour Ao Oni et toute la communauté RPGMaker en général ❤\n\nP.S. : Le RGSS1 original est lent car les technologies étaient obsolètes. Puis-je faire mieux ?"
 			},
 			es: {
 				setup: "CONFIGURACIÓN", modeAll: "Todo", modeRand: "Aleatorio", mute: "Silencio", unmute: "Activar sonido",
@@ -475,7 +309,9 @@
 				confirmDelSec: "¿Borrar sección '{0}'?", confirmDelCode: "¿Quitar este código?",
 				errNeedSec: "¡Error! Debe haber al menos una sección.",
 				allComplete: "¡Completado!", completeMsg: "Tiempo total: {0} ms. Pulsa Reiniciar.",
-				promptRename: "Nuevo nombre de la sección:"
+				promptRename: "Nuevo nombre de la sección:",
+				stats: "ESTADÍSTICAS", best: "Mejor", avg: "Prom", runs: "Intentos", secStats: "Est. de Sección", globStats: "Global statistics",
+				creatorMsg: "Escrito por Adel'gid Aragami. Con respeto a Ao Oni y a toda la comunidad de RPGMaker en general ❤\n\nP.S.: El RGSS1 original es lento porque las tecnologías estaban anticuadas. ¿Puedo hacerlo mejor?"
 			},
 			jp: {
 				setup: "システム設定", modeAll: "すべて", modeRand: "ランダム", mute: "消音", unmute: "消音解除",
@@ -493,7 +329,9 @@
 				confirmDelSec: "セクション '{0}' を削除しますか？", confirmDelCode: "このコードを削除しますか？",
 				errNeedSec: "エラー！少なくとも1つのセクションが必要です。",
 				allComplete: "すべて完了！", completeMsg: "合計時間: {0} ミリ秒。再起動してください。",
-				promptRename: "新しいセクション名を入力:"
+				promptRename: "新しいセクション名を入力:",
+				stats: "統計", best: "ベスト", avg: "平均", runs: "回数", secStats: "セクション統計", globStats: "Global statistics",
+				creatorMsg: "Adel'gid Aragamiによって書かれました。青鬼とRPGMakerコミュニティ全体に敬意を表して❤\n\nP.S.: オリジナルのRGSS1は技術が古かったため遅いです。もっとうまくできるかな？"
 			},
 			zh: {
 				setup: "系统设置", modeAll: "全部", modeRand: "随机", mute: "静音", unmute: "取消静音",
@@ -510,8 +348,10 @@
 				errLastCode: "错误！您不能删除部分中的最后一个代码。",
 				confirmDelSec: "删除部分 '{0}' 吗？", confirmDelCode: "删除此代码吗？",
 				errNeedSec: "错误！必须至少有一个部分。",
-				allComplete: "全部完成！", completeMsg: "总时间: {0} 毫秒。请按完全重启。",
-				promptRename: "输入新的部分名称:"
+				allComplete: "全部完成！", completeMsg: "总时间: {0} ms。请按完全重启。",
+				promptRename: "输入新的部分名称:",
+				stats: "统计", best: "最佳", avg: "平均", runs: "次数", secStats: "部分统计", globStats: "Global statistics",
+				creatorMsg: "由Adel'gid Aragami编写。向青鬼（Ao Oni）以及整个RPGMaker社区致敬❤\n\nP.S.：原始的RGSS1很慢，因为技术已经过时。我能做得更好吗？"
 			},
 			ko: {
 				setup: "시스템 설정", modeAll: "모두", modeRand: "랜덤", mute: "음소거", unmute: "음소거 해제",
@@ -528,23 +368,14 @@
 				errLastCode: "오류! 마지막 코드는 삭제할 수 없습니다.",
 				confirmDelSec: "'{0}' 섹션을 삭제하시겠습니까?", confirmDelCode: "이 코드를 삭제하시겠습니까?",
 				errNeedSec: "오류! 섹션이 최소 하나는 있어야 합니다.",
-				allComplete: "모두 완료!", completeMsg: "총 시간: {0} 밀리초. 전체 재시작을 누르세요.",
-				promptRename: "새 섹션 이름을 입력하세요:"
+				allComplete: "모두 완료!", completeMsg: "총 시간: {0} ms. 전체 재시작을 누르세요.",
+				promptRename: "새 섹션 이름을 입력하세요:",
+				stats: "통계", best: "최고", avg: "평균", runs: "실행 횟수", secStats: "섹션 통계", globStats: "Global statistics",
+				creatorMsg: "Adel'gid Aragami 작성. 아오오니와 RPGMaker 커뮤니티 전체에 대한 존경을 담아 ❤\n\nP.S.: 원래의 RGSS1은 기술이 구식이어서 느립니다. 제가 더 잘 만들 수 있을까요?"
 			}
 		};
 
-		const extendedTranslations = {
-			en: { stats: "STATISTICS", best: "Best", avg: "Avg", runs: "Runs", secStats: "Section Stats", globStats: "Global Stats" },
-			de: { stats: "STATISTIK", best: "Beste", avg: "Ø", runs: "Versuche", secStats: "Bereichsstatistik", globStats: "Globale Statistik" },
-			fr: { stats: "STATISTIQUES", best: "Meilleur", avg: "Moy", runs: "Essais", secStats: "Stats Section", globStats: "Stats Globales" },
-			es: { stats: "ESTADÍSTICAS", best: "Mejor", avg: "Prom", runs: "Intentos", secStats: "Est. de Sección", globStats: "Est. Globales" },
-			jp: { stats: "統計", best: "ベスト", avg: "平均", runs: "回数", secStats: "セクション統計", globStats: "グローバル統計" },
-			zh: { stats: "统计", best: "最佳", avg: "平均", runs: "次数", secStats: "部分统计", globStats: "全局统计" },
-			ko: { stats: "통계", best: "최고", avg: "평균", runs: "실행 횟수", secStats: "섹션 통계", globStats: "글로벌 통계" }
-		};
-		for(let l in extendedTranslations) { if(I18N[l]) Object.assign(I18N[l], extendedTranslations[l]); }
-		
-		let curLang = 'en';
+		let curLang ='en';
 		const t = (key, ...args) => {
 			let str = (I18N[curLang] && I18N[curLang][key]) || (I18N['en'][key]) || key;
 			args.forEach((arg, i) => { str = str.replace(`{${i}}`, arg); });
@@ -578,11 +409,11 @@
 		function makeEmptyStats() { return { all: { runs: 0, totalMs: 0, best: null }, random: { runs: 0, totalMs: 0, best: null } }; }
 
 		const defaultCategories =[
-			{ name: "Piano", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "6799", isActive: true }, { target: "9761", isActive: true }, { target: "6392", isActive: true }, { target: "1416", isActive: true }, { target: "5156", isActive: true } ] },
-			{ name: "Closet", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "5376", isActive: true } ] },
-			{ name: "Safe", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "290", isActive: true }, { target: "361", isActive: true }, { target: "528", isActive: true } ] },
-			{ name: "Iron door", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "1237", isActive: true } ] },
-			{ name: "Another safe", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "3045", isActive: true } ] }
+			{ name: "Piano room", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "6799", isActive: true }, { target: "9761", isActive: true }, { target: "6392", isActive: true }, { target: "1416", isActive: true }, { target: "5156", isActive: true } ] },
+			{ name: "Basement", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "5376", isActive: true } ] },
+			{ name: "Doll safe", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "290", isActive: true }, { target: "361", isActive: true }, { target: "528", isActive: true } ] },
+			{ name: "Annex basement keypad", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "1237", isActive: true } ] },
+			{ name: "Old building safe behind picture", isCollapsed: false, isActive: true, stats: makeEmptyStats(), codes:[ { target: "3045", isActive: true } ] }
 		];
 
 		let categories =[];
@@ -596,12 +427,17 @@
 			});
 		}
 
+		function updateGlobalStatsUI() {
+			$('global-stats-content').innerHTML = buildStatsHtml(globalStats, "").replace(/<div style="font-weight:bold.*?<\/div>/,'');
+		}
+
 		function saveData() {
 			try {
 				localStorage.setItem('aoOniLang', curLang);
 				localStorage.setItem('aoOniCategories', JSON.stringify(categories));
 				localStorage.setItem('aoOniGlobalStats', JSON.stringify(globalStats));
 			} catch(e) { console.error("Save error", e); }
+			updateGlobalStatsUI()
 		}
 
 		function loadData() {
@@ -610,7 +446,7 @@
 				const savedCats = localStorage.getItem('aoOniCategories');
 				const savedGStats = localStorage.getItem('aoOniGlobalStats');
 				if (savedLang) curLang = savedLang;
-				
+
 				if (savedCats) {
 					categories = JSON.parse(savedCats);
 					categories.forEach(c => {
@@ -662,13 +498,13 @@
 				isInitMode = false;
 				initConfig();
 			} else {
-				if (state === 'CONFIG') renderConfig();
+				if (state ==='CONFIG') renderConfig();
 			}
 		};
 
 		window.closeLangModal = function(event) {
 			if (isInitMode) return;
-			if (event.target.id === 'lang-modal') {
+			if (event.target.id ==='lang-modal') {
 				$('lang-modal').classList.add('hidden');
 			}
 		};
@@ -694,13 +530,23 @@
 			$('btn-mute').innerText = isMuted ? t('unmute') : t('mute');
 			$('btn-add-sec').innerText = t('addSec');
 			$('btn-start').innerText = t('start');
-			$('restart-btn').innerText = t('restart');
+			$('restart-btn-text').innerText = t('restart');
 			$('btn-hard-reset').innerText = t('hardReset');
-			$('btn-global-stats').innerText = t('stats');
 
-			if (state === 'FINISHED') {
+			const gText = t('globStats').split(' ');
+			if(gText.length > 1) {
+				$('btn-global-stats').innerText = gText[1];
+				$('btn-global-stats').previousSibling.textContent = gText[0] + ' ';
+			} else {
+				$('btn-global-stats').innerText = gText[0];
+			}
+
+			$('creator-text').innerText = t('creatorMsg');
+			updateGlobalStatsUI();
+
+			if (state ==='FINISHED') {
 				elCategory.innerText = t('allComplete');
-			} else if (state === 'WAITING_Z') {
+			} else if (state ==='WAITING_Z') {
 				if (runCategories[currentCategoryIdx]) {
 					elCategory.innerText = `${t('cat')}: ${runCategories[currentCategoryIdx].name}`;
 				}
@@ -754,17 +600,17 @@
 			const arrowNotation = { "0": "", "1": "↑", "2": "↑↑", "3": "↑↑↑", "4": "↑↑↑↑", "5": "↑↑↑↑↑", "6": "↓↓↓↓", "7": "↓↓↓", "8": "↓↓", "9": "↓" };
 			const n = number.length;
 			const targets =[];
-			for (let i = 0; i < n; i++) { if (number[i] !== '0') targets.push(i); }
+			for (let i = 0; i < n; i++) { if (number[i] !=='0') targets.push(i); }
 			if (targets.length === 0) return "Z";
 
 			let targetMask = 0;
 			for (const t of targets) targetMask |= (1 << t);
 
 			const startPos = 0;
-			const startMask = (number[0] !== '0') ? (1 << 0) : 0;
+			const startMask = (number[0] !=='0') ? (1 << 0) : 0;
 			const startPath = arrowNotation[number[0]];
 
-			let queue = [[startPos, startMask, startPath]];
+			let queue =[[startPos, startMask, startPath]];
 			const visited = new Set();
 			visited.add(`${startPos}_${startMask}`);
 
@@ -779,7 +625,7 @@
 					let addedArrows = "";
 					let newMask = mask;
 
-					if (number[newPos] !== '0' && !(mask & (1 << newPos))) {
+					if (number[newPos] !=='0' && !(mask & (1 << newPos))) {
 						addedArrows = arrowNotation[number[newPos]];
 						newMask |= (1 << newPos);
 					}
@@ -794,13 +640,13 @@
 			return "Z";
 		}
 
-		let gameMode = 'ALL';
+		let gameMode ='ALL';
 		let currentCategoryIdx = 0;
-		let enteredCodes = [];
+		let enteredCodes =[];
 		let digits =[];
 		let cursorPos = 0;
 
-		let state = 'CONFIG';
+		let state ='CONFIG';
 		let blindMode = false;
 		let showHint = false;
 		let qHeld = false;
@@ -835,8 +681,8 @@
 		function setMode(mode) {
 			playSound(sndMove);
 			gameMode = mode;
-			$('btn-mode-all').classList.toggle('selected', mode === 'ALL');
-			$('btn-mode-random').classList.toggle('selected', mode === 'RANDOM');
+			$('btn-mode-all').classList.toggle('selected', mode ==='ALL');
+			$('btn-mode-random').classList.toggle('selected', mode ==='RANDOM');
 		}
 
 		window.toggleCollapse = function(cIdx) {
@@ -846,18 +692,25 @@
 			renderConfig();
 		};
 
+		function truncateName(text, maxChars = 14) {
+			if (text.length <= maxChars) return text;
+			let leftPart = Math.max(3, maxChars - 6);
+			return text.substring(0, leftPart) + '...' + text.slice(-3);
+		}
+
 		function renderConfig() {
-			elConfigContainer.innerHTML = '';
+			elConfigContainer.innerHTML ='';
 			categories.forEach((cat, cIdx) => {
 				let collapseIcon = cat.isCollapsed ? '[*]' : '[+]';
 				let secBulbClass = cat.isActive ? 'yellow' : 'gray';
 				let titleStyle = cat.isActive ? '' : 'color: #666; text-decoration: line-through;';
+				let displayName = truncateName(cat.name, 14);
 				let secHtml = `
 					<div class="config-section">
 						<div class="sec-header">
-							<div>
+							<div title="${cat.name}">
 								<span class="collapse-icon" onclick="toggleCollapse(${cIdx})" title="Collapse/Expand">${collapseIcon}</span>
-								<span style="${titleStyle}">${cat.name}</span>
+								<span style="${titleStyle}">${displayName}</span>
 							</div>
 							<div>
 								<span class="icon-btn gray" id="sec-stats-btn-${cIdx}" onclick="onSectionStatsClick(${cIdx})" onmouseenter="showSectionStats(${cIdx}, event)" onmouseleave="hideStatsTooltip()" title="Stats">📄</span>
@@ -875,7 +728,7 @@
 						let hintStr = codeObj.hint ? ` <span style="color:#888;font-size:12px;">(${codeObj.hint})</span>` : '';
 						secHtml += `
 							<div class="code-row">
-								<span>└─ ${codeObj.target}${hintStr}</span>
+								<span title="${codeObj.target}">└─ ${codeObj.target}${hintStr}</span>
 								<div>
 									<span class="icon-btn blue" onclick="askEditCode(${cIdx}, ${codeIdx})" title="Change code">✎</span>
 									<span class="icon-btn ${bulbClass}" onclick="toggleCodeActive(${cIdx}, ${codeIdx})" title="On/Off">💡</span>
@@ -889,7 +742,7 @@
 				elConfigContainer.innerHTML += secHtml;
 			});
 		}
-		
+
 		window.toggleCategoryActive = function(cIdx) {
 			playSound(sndMove);
 			categories[cIdx].isActive = !categories[cIdx].isActive;
@@ -908,7 +761,7 @@
 			let avgRand = rRand ? Math.round(stats.random.totalMs / rRand) : null;
 			return `
 				<div style="font-weight:bold; margin-bottom:10px; text-align:center; border-bottom:1px solid white; padding-bottom:5px;">${title}</div>
-				<div style="display:flex; justify-content:space-between; gap:30px; font-size:14px; text-align:left;">
+				<div style="display:flex; justify-content:space-between; gap:15px; font-size:14px; text-align:left;">
 					<div>
 						<div style="color:#4CAF50; margin-bottom:5px; font-weight:bold;">[ALL]</div>
 						<div>${t('runs')}: ${rAll}</div>
@@ -941,7 +794,7 @@
 		window.openStatsModal = function(type, cIdx) {
 			playSound(sndConfirm);
 			let title, stats;
-			if(type === 'GLOBAL') {
+			if(type ==='GLOBAL') {
 				title = t('globStats');
 				stats = globalStats;
 			} else {
@@ -949,12 +802,12 @@
 				stats = categories[cIdx].stats;
 			}
 			$('stats-modal-title').innerText = title;
-			$('stats-modal-content').innerHTML = buildStatsHtml(stats, type === 'GLOBAL' ? 'Global' : 'Section').replace(/<div style="font-weight:bold.*?<\/div>/,'');
+			$('stats-modal-content').innerHTML = buildStatsHtml(stats, type ==='GLOBAL' ? 'Global' : 'Section').replace(/<div style="font-weight:bold.*?<\/div>/,'');
 			$('stats-modal').classList.remove('hidden');
 		};
 
 		window.closeStatsModal = function(e) {
-			if(e && e.target.id !== 'stats-modal') return;
+			if(e && e.target.id !=='stats-modal') return;
 			playSound(sndMove);
 			$('stats-modal').classList.add('hidden');
 		};
@@ -967,23 +820,18 @@
 
 			if(globalStatsClicks >= 5) {
 				globalStatsClicks = 0;
-				btn.innerText = t('stats');
+				const origText = t('globStats').split(' ')[1] || t('globStats');
+				btn.innerText = origText;
 				globalStats = makeEmptyStats();
 				saveData();
 				playSound(sndRestart);
-			} else if(globalStatsClicks > 1) {
+			} else {
 				btn.innerText = `[ ${5 - globalStatsClicks} ]`;
 				globalStatsTo = setTimeout(() => {
 					globalStatsClicks = 0;
-					btn.innerText = t('stats');
-					openStatsModal('GLOBAL');
-				}, 500);
-			} else {
-				globalStatsTo = setTimeout(() => {
-					globalStatsClicks = 0;
-					btn.innerText = t('stats');
-					openStatsModal('GLOBAL');
-				}, 500);
+					const origText = t('globStats').split(' ')[1] || t('globStats');
+					btn.innerText = origText;
+				}, 600);
 			}
 		};
 
@@ -995,7 +843,7 @@
 
 			if(secStatsClicks[cIdx] >= 5) {
 				secStatsClicks[cIdx] = 0;
-				btn.innerText = '📄';
+				btn.innerText ='📄';
 				categories[cIdx].stats = makeEmptyStats();
 				saveData();
 				playSound(sndRestart);
@@ -1004,13 +852,13 @@
 				btn.innerText = `[${5 - secStatsClicks[cIdx]}]`;
 				secStatsTo[cIdx] = setTimeout(() => {
 					secStatsClicks[cIdx] = 0;
-					btn.innerText = '📄';
+					btn.innerText ='📄';
 					openStatsModal('SECTION', cIdx);
 				}, 500);
 			} else {
 				secStatsTo[cIdx] = setTimeout(() => {
 					secStatsClicks[cIdx] = 0;
-					btn.innerText = '📄';
+					btn.innerText ='📄';
 					openStatsModal('SECTION', cIdx);
 				}, 500);
 			}
@@ -1116,32 +964,102 @@
 		// ==========================================
 
 		function initConfig() {
-			state = 'CONFIG';
+			state ='CONFIG';
 			elConfigPanel.classList.remove('hidden');
 			elGamePanel.classList.add('hidden');
+			$('global-stats-container').classList.remove('hidden');
 			renderConfig();
 		}
 
+		let mobileBlindMode = false;
+		let holdTimer, fillProgress = 0, isHoldingRestart = false, holdStartTime = 0;
+		const fillEl = $('restart-fill');
+
+		function resetHold() {
+			isHoldingRestart = false;
+			cancelAnimationFrame(holdTimer);
+			fillProgress = 0;
+			fillEl.style.width ='0%';
+		}
+
+		function holdStep() {
+			if(!isHoldingRestart) return;
+			let elapsed = Date.now() - holdStartTime;
+			fillProgress = (elapsed * elapsed) / 9000;
+
+			if(fillProgress >= 100) {
+				fillProgress = 100;
+				fillEl.style.width ='100%';
+				mobileBlindMode = !mobileBlindMode;
+				btnRestart.classList.toggle('blind-active', mobileBlindMode);
+				playSound(sndConfirm);
+				resetHold();
+			} else {
+				fillEl.style.width = fillProgress + '%';
+				holdTimer = requestAnimationFrame(holdStep);
+			}
+		}
+
+		btnRestart.addEventListener('mousedown', (e) => {
+			if (e.button !== 0) return;
+			isHoldingRestart = true;
+			holdStartTime = Date.now();
+			holdTimer = requestAnimationFrame(holdStep);
+		});
+		btnRestart.addEventListener('touchstart', () => {
+			isHoldingRestart = true;
+			holdStartTime = Date.now();
+			holdTimer = requestAnimationFrame(holdStep);
+		}, {passive: true});
+
+		btnRestart.addEventListener('mouseup', () => {
+			if(isHoldingRestart && fillProgress < 100) { playSound(sndRestart); initConfig(); trackSecret('RESTART'); }
+			resetHold();
+		});
+		btnRestart.addEventListener('touchend', () => {
+			if(isHoldingRestart && fillProgress < 100) { playSound(sndRestart); initConfig(); trackSecret('RESTART'); }
+			resetHold();
+		});
+		btnRestart.addEventListener('mouseleave', resetHold);
+
+		const secretSeq =["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","RESTART","START"];
+		let currentSeq =[];
+
+		function trackSecret(input) {
+			currentSeq.push(input);
+			if (currentSeq.length > secretSeq.length) currentSeq.shift();
+			if (currentSeq.join(',') === secretSeq.join(',')) {
+				$('creator-modal').classList.remove('hidden');
+				playSound(sndConfirm);
+				currentSeq =[];
+				return true;
+			}
+			return false;
+		}
+
 		window.startTraining = function() {
+			if (trackSecret('START')) return;
+
 			runCategories = categories.filter(c => c.isActive && c.codes.filter(co => co.isActive).length > 0);
 			if (runCategories.length === 0) return showError(t('errActive'));
-			
+
 			playSound(sndConfirm);
-			blindMode = qHeld;
-			state = 'WAITING_Z';
+			blindMode = qHeld || mobileBlindMode;
+			state ='WAITING_Z';
 			currentCategoryIdx = 0;
 			showHint = false;
 			totalStartTime = Date.now();
 
 			elConfigPanel.classList.add('hidden');
 			elGamePanel.classList.remove('hidden');
+			$('global-stats-container').classList.add('hidden');
 			elMessage.innerText = "";
 			setupCategory();
 		};
 
 		function setupCategory() {
 			if (currentCategoryIdx >= runCategories.length) {
-				state = 'FINISHED';
+				state ='FINISHED';
 				elZPrompt.classList.add('hidden');
 				const totalTime = Date.now() - totalStartTime;
 
@@ -1155,10 +1073,11 @@
 				elMessage.innerText = t('completeMsg', totalTime);
 				elDigits.innerHTML = "";
 				elHint.classList.add('hidden');
+				$('global-stats-container').classList.remove('hidden');
 				return;
 			}
 
-			state = 'WAITING_Z';
+			state ='WAITING_Z';
 			enteredCodes =[];
 			sectionRealStartTime = null;
 			const category = runCategories[currentCategoryIdx];
@@ -1167,7 +1086,7 @@
 			const requiredWidth = Math.max(400, (reqLen * 26) + 120);
 			elLockBox.style.width = requiredWidth + 'px';
 
-			if (gameMode === 'RANDOM') {
+			if (gameMode ==='RANDOM') {
 				const activeCodes = category.codes.filter(c => c.isActive);
 				const randIdx = Math.floor(Math.random() * activeCodes.length);
 				category.randomTarget = activeCodes[randIdx].target;
@@ -1181,6 +1100,18 @@
 			resetDigits();
 		}
 
+		function bringToFront(panel) {
+			const stats = $('global-stats-container');
+			const menu = $('config-panel');
+			if(panel ==='STATS') {
+				stats.style.zIndex ='70';
+				menu.style.zIndex ='60';
+			} else {
+				stats.style.zIndex ='60';
+				menu.style.zIndex ='70';
+			}
+		}
+
 		function resetDigits() {
 			const reqLen = runCategories[currentCategoryIdx].codes[0].target.length;
 			digits = Array(reqLen).fill(0);
@@ -1188,7 +1119,7 @@
 		}
 
 		function startInput() {
-			state = 'INPUTTING';
+			state ='INPUTTING';
 			elZPrompt.classList.add('hidden');
 			startTime = Date.now();
 			if (!sectionRealStartTime) sectionRealStartTime = startTime;
@@ -1196,20 +1127,20 @@
 		}
 
 		function render() {
-			if (state === 'FINISHED' || state === 'WAITING_Z' || state === 'CONFIG') return;
+			if (state ==='FINISHED' || state ==='WAITING_Z' || state ==='CONFIG') return;
 
 			elDigits.innerHTML = "";
 			for (let i = 0; i < digits.length; i++) {
 				const block = document.createElement('div');
-				block.className = 'digit-block';
+				block.className ='digit-block';
 
 				const cursor = document.createElement('div');
-				cursor.className = 'cursor';
+				cursor.className ='cursor';
 				if (i !== cursorPos) cursor.classList.add('hidden-cursor');
-				cursor.innerText = '▸';
+				cursor.innerText ='▸';
 
 				const digit = document.createElement('div');
-				digit.className = 'digit';
+				digit.className ='digit';
 				digit.innerText = blindMode ? " " : digits[i];
 
 				block.appendChild(cursor);
@@ -1245,7 +1176,7 @@
 			const finishSection = () => {
 				const timeTaken = Date.now() - startTime;
 				elMessage.innerText = `${t('good')} ${timeTaken} ${t('ms')}`;
-				
+
 				let sectionTime = Date.now() - sectionRealStartTime;
 				let cMode = gameMode.toLowerCase();
 				category.stats[cMode].runs++;
@@ -1261,7 +1192,7 @@
 				enteredCodes.push(currentInput);
 				showHint = false;
 
-				if (gameMode === 'RANDOM') {
+				if (gameMode ==='RANDOM') {
 					if (currentInput === category.randomTarget) {
 						finishSection();
 					} else {
@@ -1287,20 +1218,21 @@
 
 		window.addEventListener('keydown', (e) => {
 			const { code } = e;
-			const isConfirm = ["KeyZ", "KeyC", "Enter", "NumpadEnter"].includes(code);
+			if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(code)) trackSecret(code);
+			const isConfirm =["KeyZ", "KeyC", "Enter", "NumpadEnter"].includes(code);
 			const isHint = code === "KeyH";
 			const isQ = code === "KeyQ";
 
 			if (isQ) qHeld = true;
 			if (e.repeat) return;
 
-			if (state === 'WAITING_Z' && isConfirm) {
+			if (state ==='WAITING_Z' && isConfirm) {
 				playSound(sndConfirm);
 				startInput();
 				return;
 			}
 
-			if (state === 'INPUTTING') {
+			if (state ==='INPUTTING') {
 				const move = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
 				const change = { ArrowUp: 1, ArrowDown: -1 }[e.key];
 
@@ -1324,14 +1256,9 @@
 		});
 
 		window.addEventListener('keyup', (e) => {
-			if (e.code === 'KeyQ') qHeld = false;
+			if (e.code ==='KeyQ') qHeld = false;
 		});
 
-		btnRestart.addEventListener('click', () => {
-			playSound(sndRestart);
-			initConfig();
-		});
-		
 		window.simKey = function(code, e) {
 			if(e) { e.preventDefault(); e.stopPropagation(); }
 			const keyMap = { 'ArrowUp': 'ArrowUp', 'ArrowDown': 'ArrowDown', 'ArrowLeft': 'ArrowLeft', 'ArrowRight': 'ArrowRight', 'KeyZ': 'z', 'KeyH': 'h' };
@@ -1340,28 +1267,62 @@
 		};
 
 		let isDraggingPad = false, padOffsetX = 0, padOffsetY = 0;
+		let padScale = 1.0, initialDist = 0, initialScale = 1.0;
 		const pad = $('dpad-container');
 
-		pad.addEventListener('touchstart', (e) => {
-			if(e.target.classList.contains('dpad-btn')) return;
-			isDraggingPad = true;
-			let touch = e.touches[0];
-			let rect = pad.getBoundingClientRect();
-			padOffsetX = touch.clientX - rect.left;
-			padOffsetY = touch.clientY - rect.top;
-		}, {passive: false});
+		function getEventPos(e) { return e.touches ? e.touches[0] : e; }
 
-		document.addEventListener('touchmove', (e) => {
+		function startDrag(e) {
+			if(e.target.classList.contains('dpad-btn')) return;
+			if(e.touches && e.touches.length === 2) {
+				isDraggingPad = false;
+				initialDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+				initialScale = padScale;
+				return;
+			}
+			isDraggingPad = true;
+			let pos = getEventPos(e);
+			let rect = pad.getBoundingClientRect();
+			padOffsetX = (pos.clientX - rect.left) / padScale;
+			padOffsetY = (pos.clientY - rect.top) / padScale;
+		}
+
+		function doDrag(e) {
+			if(e.touches && e.touches.length === 2) {
+				e.preventDefault();
+				let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+				padScale = Math.min(1.0, Math.max(0.4, initialScale * (dist / initialDist)));
+				pad.style.transform = `scale(${padScale})`;
+				pad.style.transformOrigin = "top left";
+				return;
+			}
 			if(!isDraggingPad) return;
 			e.preventDefault();
-			let touch = e.touches[0];
-			pad.style.left = (touch.clientX - padOffsetX) + 'px';
-			pad.style.top = (touch.clientY - padOffsetY) + 'px';
-			pad.style.bottom = 'auto';
-			pad.style.right = 'auto';
-		}, {passive: false});
+			let pos = getEventPos(e);
 
-		document.addEventListener('touchend', () => { isDraggingPad = false; });
+			let maxX = window.innerWidth - (160 * padScale);
+			let maxY = window.innerHeight - (160 * padScale);
+
+			let newX = Math.max(0, Math.min(pos.clientX - (padOffsetX * padScale), maxX));
+			let newY = Math.max(0, Math.min(pos.clientY - (padOffsetY * padScale), maxY));
+
+			pad.style.left = newX + 'px';
+			pad.style.top = newY + 'px';
+			pad.style.bottom ='auto';
+			pad.style.right ='auto';
+		}
+
+		function endDrag() { isDraggingPad = false; }
+
+		pad.addEventListener('touchstart', startDrag, {passive: false});
+		document.addEventListener('touchmove', doDrag, {passive: false});
+		document.addEventListener('touchend', endDrag);
+
+		pad.addEventListener('mousedown', startDrag);
+		document.addEventListener('mousemove', doDrag);
+		document.addEventListener('mouseup', endDrag);
+
+		pad.style.transformOrigin = "top left";
 
 		window.toggleJoystick = function() {
 			pad.classList.toggle('hidden');
@@ -1372,8 +1333,13 @@
 		}
 
 		$('z-prompt').addEventListener('click', () => {
-			if (state === 'WAITING_Z') window.simKey('KeyZ');
+			if (state ==='WAITING_Z') window.simKey('KeyZ');
 		});
+
+		$('global-stats-container').addEventListener('mousedown', () => bringToFront('STATS'));
+		$('global-stats-container').addEventListener('touchstart', () => bringToFront('STATS'), {passive: true});
+		$('config-panel').addEventListener('mousedown', () => bringToFront('MENU'));
+		$('config-panel').addEventListener('touchstart', () => bringToFront('MENU'), {passive: true});
 
 		initApp();
 	</script>
