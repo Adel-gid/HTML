@@ -2,7 +2,7 @@
 
 A high-performance web-based training tool designed for the **Ao Oni speedrunning community**. Practice complex password sequences with frame-perfect feedback, smart notation hints, and authentic audio cues.
 
-**Created by :** Adel'gid Aragami (creator of the [MASTER library](https://github.com/Adel-gid/MASTER))
+**Created by :** Aya 目理図 (creator of the [MASTER library](https://github.com/Aya-Merizu/MASTER))
 
 ## 🚀 Features
 
